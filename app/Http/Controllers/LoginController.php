@@ -1,41 +1,56 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Models\MsUser;
+
 class LoginController extends Controller
 {
-    public function showLogin(){
+    public function showLogin()
+    {
         return view('login');
     }
 
-    public function login(Request $request){
-
+    public function login(Request $request)
+    {
         $request->validate([
-            'email' => 'required|string',
-            'password' => 'required|string',
+            'email' => 'required|string|email',
+            'password' => 'required|string|min:8',
         ]);
-
-        // $pelajar = MsUser::where('role', 2);
-        // $tutor = MsUser::where('role', 1);
-
+    
         $user = MsUser::where('email', $request->email)->first();
-        if ($user && $request->password == $user->password) {
-            // Simpan user di sesi
-            session(['id' => $user->id, 'username' => $user->username, 'role' => $user->role]);
-
-          
-            if ($user->role == 1) {
-                return redirect('/tutor');  // ini buat tutor
-            } else {
-                return redirect('/pelajar');  // pelajar
+    
+        if (!$user) {
+            return redirect()->back()->withErrors(['email' => 'Email tidak ditemukan.']);
         }
-
-       
-        return redirect()->back()->withErrors([
-            'username' => 'Username atau password salah.',
+    
+        if (!Hash::check($request->password, $user->password)) {
+            return redirect()->back()->withErrors(['password' => 'Password salah.']);
+        }
+    
+        // Menyimpan data user dalam sesi
+        session([
+            'id' => $user->id,
+            'username' => $user->username,
+            'role' => $user->role,
+            'email' => $user->email,
+            'TeacherId' => $user->TeacherId ?? null // Simpan TeacherId jika ada
         ]);
+    
+        // Redirect ke halaman yang sesuai berdasarkan role
+        // return $user->role == 1
+        //     ? redirect()->route('tutor')
+        //     : redirect('/pelajar');
+
+        if ($user->role == 3) { // Admin
+            return redirect()->route('admin');
+        } elseif ($user->role == 1) { // Tutor
+            return redirect()->route('tutor');
+        } else { // Pelajar
+            return redirect('/pelajar');
+        }
     }
-    }
+    
+
 }
