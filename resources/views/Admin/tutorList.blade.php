@@ -31,7 +31,7 @@
                         </button>
                     </th>
                     <th class="border border-gray-300 px-4 py-2 text-left">
-                        Role
+                        Tutor ID
                         <button type="submit" name="sort" value="role" class="ml-2 text-blue-500">
                             <i class="fas fa-sort"></i>
                         </button>
@@ -50,7 +50,7 @@
                     <tr>
                         <td class="border border-gray-300 px-4 py-2">{{ $user->id }}</td>
                         <td class="border border-gray-300 px-4 py-2">{{ $user->username }}</td>
-                        <td class="border border-gray-300 px-4 py-2">{{ $user->role }}</td>
+                        <td class="border border-gray-300 px-4 py-2">{{ $user->TeacherId }}</td>
                         <td class="border border-gray-300 px-4 py-2">{{ $user->email }}</td>
                         <td class="border border-gray-300 px-2 py-2 text-center">
                             <button onclick="return confirmDelete('{{ $user->id }}');" class="bg-red-500 text-white px-4 py-2 rounded-lg">
@@ -69,19 +69,7 @@
         {{ $users->links() }} <!-- Untuk pagination -->
     </div>
 
-    <!-- SweetAlert Konfirmasi Penghapusan -->
 
-@if(session('success'))
-    <script>
-        Swal.fire({
-            icon: 'success',
-            title: 'Berhasil!',
-            text: '{{ session('success') }}',
-            showConfirmButton: false,
-            timer: 1500
-        });
-    </script>
-@endif
 
 
 @endsection

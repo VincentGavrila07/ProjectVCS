@@ -29,7 +29,7 @@
         var roleChart = new Chart(ctx, {
             type: 'pie',
             data: {
-                labels: ['Role 1', 'Role 2'], // Label untuk chart
+                labels: ['Tutor', 'Pelajar'], // Label untuk chart
                 datasets: [{
                     label: 'Persentase User Berdasarkan Role',
                     data: [role1Count, role2Count], // Data jumlah pengguna berdasarkan role

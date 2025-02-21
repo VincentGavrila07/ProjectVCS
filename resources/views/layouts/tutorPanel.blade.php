@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
+    <title>Tutor</title>
     <!-- SweetAlert2, Tailwind & FontAwesome -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-</head>
-<style>
+    <style>
         #sidebar {
-        height: 100vh; /* Tinggi sidebar sesuai viewport */
-        width: 16rem; /* Lebar sidebar */
-        background-color: #1f2937; /* Warna latar sidebar */
-        position: fixed; /* Sidebar tetap di tempatnya */
-        top: 0;
-        left: 0;
-    }
-</style>
+            height: 100vh; /* Tinggi sidebar sesuai viewport */
+            width: 16rem; /* Lebar sidebar */
+            background-color: #1f2937; /* Warna latar sidebar */
+            position: fixed; /* Sidebar tetap di tempatnya */
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
 <body class="bg-gray-100">
 
     <div class="flex h-screen">
@@ -49,23 +49,13 @@
             <!-- Menu -->
             <ul>
                 <li>
-                    <a href="{{ route('admin') }}" class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded {{ Route::is('admin') ? 'bg-yellow-500' : '' }}">
+                    <a href="{{ route('tutor') }}" class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded {{ Route::is('tutor') ? 'bg-yellow-500' : '' }}">
                         Dashboard
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('userList') }}" class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded {{ Request::is('admin/userList') ? 'bg-yellow-500' : '' }}">
-                        Daftar User
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('tutorList') }}" class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded {{ Request::is('admin/tutorList') ? 'bg-yellow-500' : '' }}">
-                        Daftar Tutor
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('pelajarList') }}" class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded {{ Request::is('admin/pelajarList') ? 'bg-yellow-500' : '' }}">
-                        Daftar Pelajar
+                    <a href="{{ route('profile.edit.tutor') }}" class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded {{ Route::is('profile.edit.tutor') ? 'bg-yellow-500' : '' }}">
+                        Edit Profile
                     </a>
                 </li>
                 <li>
@@ -81,7 +71,7 @@
 
         <!-- Tombol Toggle Sidebar -->
         <button id="toggleSidebar" class="fixed top-4 left-4 text-white p-4 bg-gray-800 rounded-md z-50 md:hidden transition-all duration-300">
-            <i id="toggleIcon" class="fas fa-bars"></i> <!-- Ikon hamburger -->
+            <i id="toggleIcon" class="fas fa-bars"></i>
         </button>
 
         <!-- Content Area -->
@@ -91,25 +81,23 @@
     </div>
 
     <script>
-        const sidebar = document.getElementById('sidebar');
-        const toggleButton = document.getElementById('toggleSidebar');
-        const toggleIcon = document.getElementById('toggleIcon');
+    const sidebar = document.getElementById('sidebar');
+    const toggleButton = document.getElementById('toggleSidebar');
+    const toggleIcon = document.getElementById('toggleIcon');
 
-        toggleButton.addEventListener('click', function () {
-            if (sidebar.classList.contains('-translate-x-full')) {
-                // Buka sidebar
-                sidebar.classList.remove('-translate-x-full');
-                toggleButton.classList.add('left-64'); // Pindahkan tombol ke dalam sidebar
-                toggleIcon.classList.remove('fa-bars');
-                toggleIcon.classList.add('fa-arrow-left'); // Ubah ikon ke panah kiri
-            } else {
-                // Tutup sidebar
-                sidebar.classList.add('-translate-x-full');
-                toggleButton.classList.remove('left-64'); // Kembalikan tombol ke posisi semula
-                toggleIcon.classList.remove('fa-arrow-left');
-                toggleIcon.classList.add('fa-bars'); // Kembalikan ikon ke hamburger
-            }
-        });
+    toggleButton.addEventListener('click', function () {
+        if (sidebar.classList.contains('-translate-x-full')) {
+            sidebar.classList.remove('-translate-x-full');
+            toggleButton.classList.add('left-64'); // Pindahkan tombol ke dalam sidebar
+            toggleIcon.classList.remove('fa-bars');
+            toggleIcon.classList.add('fa-arrow-left');
+        } else {
+            sidebar.classList.add('-translate-x-full');
+            toggleButton.classList.remove('left-64'); // Kembalikan tombol ke posisi semula
+            toggleIcon.classList.remove('fa-arrow-left');
+            toggleIcon.classList.add('fa-bars');
+        }
+    });
     </script>
 
 </body>

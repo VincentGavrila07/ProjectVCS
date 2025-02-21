@@ -56,7 +56,7 @@
             </tbody>
         </table>
     </form>
-
+    
     <!-- Pagination -->
     <div class="mt-4">
         {{ $users->links() }} <!-- Untuk pagination -->

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Models\MsUser;
+use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
@@ -35,7 +36,8 @@ class LoginController extends Controller
             'username' => $user->username,
             'role' => $user->role,
             'email' => $user->email,
-            'TeacherId' => $user->TeacherId ?? null // Simpan TeacherId jika ada
+            'TeacherId' => $user->TeacherId ?? null, // Simpan TeacherId jika ada
+            'image' => $user->image
         ]);
     
         // Redirect ke halaman yang sesuai berdasarkan role
@@ -51,6 +53,16 @@ class LoginController extends Controller
             return redirect('/pelajar');
         }
     }
+
+    public function logout(Request $request)
+    {
+        $request->session()->flush(); // Hapus semua session yang tersimpan
+        $request->session()->invalidate(); // Invalidasi session agar tidak bisa digunakan lagi
+        $request->session()->regenerateToken(); // Regenerasi CSRF token agar aman
+
+        return redirect()->route('login'); // Redirect ke halaman login
+    }
+
     
 
 }

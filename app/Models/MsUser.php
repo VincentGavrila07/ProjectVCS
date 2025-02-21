@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\MsSubject;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class MsUser extends Model
 {
     use HasFactory;
 
     protected $table = 'msuser'; 
-    protected $fillable = ['username', 'password', 'email', 'role','TeacherId']; 
+    protected $fillable = ['username', 'password', 'email', 'role','TeacherId','subjectClass']; 
 
     protected $primaryKey = 'id'; 
 
@@ -19,4 +20,12 @@ class MsUser extends Model
     const UPDATED_AT = 'updated_at';
 
     public $timestamps = true; 
+
+    // MsUser Model
+    public function subjectClass()
+    {
+        return $this->belongsTo(MsSubject::class, 'subjectClass', 'id');
+    }
+    
+    
 }
