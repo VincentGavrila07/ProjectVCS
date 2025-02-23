@@ -59,6 +59,12 @@
                     </a>
                 </li>
                 <li>
+                    <a href="{{ route('chat.index') }}" class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded 
+                        {{ request()->routeIs('chat.index') || request()->routeIs('chat.room') ? 'bg-yellow-500' : '' }}">
+                        Chat
+                    </a>
+                </li>
+                <li>
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
                         <button type="submit" class="w-full text-left block py-2 px-4 mt-2 hover:bg-red-600 rounded">

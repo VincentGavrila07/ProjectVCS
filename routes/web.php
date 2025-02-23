@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\TutorController;
@@ -63,3 +64,8 @@ Route::get('/profile/tutor', [ProfileController::class, 'edit'])->name('profile.
 Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
 Route::get('/findTutor', [FindTutorController::class, 'index'])->name('findTutor');
+
+Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+Route::get('/chat/{room_id}', [ChatController::class, 'showRoom'])->name('chat.room');
+Route::post('/chat/{room_id}/send', [ChatController::class, 'sendMessage'])->name('chat.send');
+Route::get('/chat/create/{tutor_id}', [ChatController::class, 'createRoom'])->name('chat.create');

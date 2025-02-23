@@ -84,9 +84,13 @@
             <div class="bg-white shadow-lg rounded-xl p-4 flex flex-col items-center text-center border border-gray-200">
                 
                 <!-- Foto Tutor (Bulat) -->
-                <img src="{{ asset('storage/' . $tutor->image) }}" 
-                     alt="Tutor Image" 
-                     class="w-24 h-24 object-cover rounded-full border-2 border-blue-500 shadow-md">
+                @php
+                    $tutorImage = $tutor->image ? asset('storage/' . $tutor->image) : asset('images/user.jpg');
+                @endphp
+
+                <img src="{{ $tutorImage }}" 
+                    alt="Tutor Image" 
+                    class="w-24 h-24 object-cover rounded-full border-2 border-blue-500 shadow-md">
 
                 <!-- Detail Tutor -->
                 <h3 class="text-lg font-semibold mt-3">{{ $tutor->username }}</h3>
@@ -118,10 +122,11 @@
                  @endif
 
                 <!-- Tombol Chat Sekarang -->
-                <a 
-                   class="mt-3 px-4 py-2 bg-blue-500 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-blue-600 transition duration-200 cursor-pointer">
+                <a href="{{ route('chat.create', ['tutor_id' => $tutor->id]) }}" 
+                class="mt-3 px-4 py-2 bg-blue-500 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-blue-600 transition duration-200 cursor-pointer">
                     💬 Chat Sekarang
                 </a>
+
                 <a 
                    class="mt-3 px-4 py-2 bg-green-500 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-green-600 transition duration-200 cursor-pointer">
                     🛒 Pesan Sekarang

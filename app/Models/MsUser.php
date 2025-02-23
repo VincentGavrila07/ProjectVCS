@@ -27,5 +27,20 @@ class MsUser extends Model
         return $this->belongsTo(MsSubject::class, 'subjectClass', 'id');
     }
     
+    public function chatRoomsAsStudent()
+    {
+        return $this->hasMany(MsChatRoom::class, 'student_id');
+    }
+
+    public function chatRoomsAsTutor()
+    {
+        return $this->hasMany(MsChatRoom::class, 'tutor_id');
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(TrMessages::class, 'sender_id');
+    }
+
     
 }
