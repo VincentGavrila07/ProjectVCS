@@ -72,6 +72,12 @@
                     </a>
                 </li>
                 <li>
+                    <a href="{{ route('wallet.index') }}" class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded 
+                        {{ Route::is('wallet.index') ? 'bg-yellow-500' : '' }}">
+                        Wallet
+                    </a>
+                </li>
+                <li>
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
                         <button type="submit" class="w-full text-left block py-2 px-4 mt-2 hover:bg-red-600 rounded">

@@ -9,6 +9,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\DbConnectController;
 use App\Http\Controllers\FindTutorController;
+use App\Http\Controllers\WalletController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -69,3 +71,8 @@ Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
 Route::get('/chat/{room_id}', [ChatController::class, 'showRoom'])->name('chat.room');
 Route::post('/chat/{room_id}/send', [ChatController::class, 'sendMessage'])->name('chat.send');
 Route::get('/chat/create/{tutor_id}', [ChatController::class, 'createRoom'])->name('chat.create');
+
+
+Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
+Route::post('/wallet/deposit', [WalletController::class, 'deposit'])->name('wallet.deposit');
+Route::post('/wallet/handle-notification', [WalletController::class, 'handleNotification'])->name('wallet.handle.notification');

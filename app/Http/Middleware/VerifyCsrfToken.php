@@ -12,6 +12,6 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        //
+        '/wallet/handle-notification', // Tambahkan endpoint webhook di sini
     ];
 }
