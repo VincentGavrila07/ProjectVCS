@@ -7,7 +7,7 @@
         
         <!-- Saldo Section -->
         <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white mb-6">
-            <p class="text-sm font-semibold">Saldo Anda:</p>
+            <p class="text-sm font-semibold">Saldo {{ session('username') }} :</p>
             <p class="text-2xl font-bold">Rp {{ number_format($wallet->balance, 0, ',', '.') }}</p>
         </div>
 
