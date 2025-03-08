@@ -10,6 +10,8 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\DbConnectController;
 use App\Http\Controllers\FindTutorController;
 use App\Http\Controllers\WalletController;
+use App\Http\Controllers\VideoCallController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -76,3 +78,13 @@ Route::get('/chat/create/{tutor_id}', [ChatController::class, 'createRoom'])->na
 Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
 Route::post('/wallet/deposit', [WalletController::class, 'deposit'])->name('wallet.deposit');
 Route::post('/wallet/handle-notification', [WalletController::class, 'handleNotification'])->name('wallet.handle.notification');
+
+
+
+Route::post('/sewa-tutor', [TutorController::class, 'sewaTutor'])->name('sewa.tutor');
+Route::post('/confirm-request', [TutorController::class, 'confirmRequest'])->name('confirm.request');
+Route::post('/reject-request', [TutorController::class, 'rejectRequest'])->name('reject.request');
+Route::get('/check-notification', [TutorController::class, 'checkNotification'])->name('check.notification');
+
+
+Route::get('/video-call/{transaction_id}', [VideoCallController::class, 'index'])->name('video.call');

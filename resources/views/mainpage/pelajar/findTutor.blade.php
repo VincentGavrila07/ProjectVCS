@@ -127,16 +127,18 @@
                     💬 Chat Sekarang
                 </a>
 
-                <a 
-                   class="mt-3 px-4 py-2 bg-green-500 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-green-600 transition duration-200 cursor-pointer">
-                    🛒 Pesan Sekarang
+                <a href="#" 
+                onclick="sewaTutor({{ $tutor->id }})" 
+                class="mt-3 px-4 py-2 bg-green-500 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-green-600 transition duration-200 cursor-pointer">
+                    🛒 Sewa Sekarang
                 </a>
             </div>
         @empty
             <p class="text-center col-span-4 text-gray-500">Tidak ada tutor yang ditemukan.</p>
         @endforelse
     </div>
-    <script>
+
+<script>
 document.addEventListener("DOMContentLoaded", function () {
     const filterSection = document.querySelector("form"); // Elemen filter
     const filterNowBtn = document.getElementById("filterNowBtn");
@@ -160,6 +162,57 @@ document.addEventListener("DOMContentLoaded", function () {
         filterSection.scrollIntoView({ behavior: "smooth" });
     });
 });
+function sewaTutor(tutorId) {
+        // Kirim request ke backend untuk membuat transaksi
+        fetch('/sewa-tutor', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ tutor_id: tutorId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    title: 'Menunggu Konfirmasi Tutor',
+                    html: `Tutor memiliki waktu 20 Detik detik untuk merespons.`,
+                    timer: 20000, // 10 detik
+                    timerProgressBar: true,
+                    didOpen: () => {
+                        const timerElement = Swal.getHtmlContainer().querySelector('b');
+                        setInterval(() => {
+                            timer--;
+                            timerElement.textContent = timer;
+                        }, 20000);
+                    }
+                }).then((result) => {
+                    if (result.dismiss === Swal.DismissReason.timer) {
+                        // Jika waktu habis, tampilkan pesan
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Waktu Habis',
+                            text: 'Tutor tidak merespons dalam waktu yang ditentukan.',
+                        });
+                    }
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: data.message || 'Terjadi kesalahan saat memproses permintaan.',
+                });
+            }
+        })
+        .catch(error => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Terjadi kesalahan saat menghubungi server.',
+            });
+        });
+    }
 </script>
 
 @endsection
