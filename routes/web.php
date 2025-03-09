@@ -81,10 +81,11 @@ Route::post('/wallet/handle-notification', [WalletController::class, 'handleNoti
 
 
 
-Route::post('/sewa-tutor', [TutorController::class, 'sewaTutor'])->name('sewa.tutor');
-Route::post('/confirm-request', [TutorController::class, 'confirmRequest'])->name('confirm.request');
-Route::post('/reject-request', [TutorController::class, 'rejectRequest'])->name('reject.request');
-Route::get('/check-notification', [TutorController::class, 'checkNotification'])->name('check.notification');
 
+    Route::post('/sewa-tutor', [TutorController::class, 'sewaTutor'])->name('sewa.tutor');
+    Route::post('/confirm-request', [TutorController::class, 'confirmRequest'])->name('confirm.request');
+    Route::post('/reject-request', [TutorController::class, 'rejectRequest'])->name('reject.request');
+    Route::get('/check-notification', [TutorController::class, 'checkNotification'])->name('check.notification');
+    Route::post('/check-transaction-status', [TutorController::class, 'checkTransactionStatus'])->name('check.transaction.status');
+    Route::get('/video-call/{transaction_id}', [VideoCallController::class, 'index'])->name('video.call');
 
-Route::get('/video-call/{transaction_id}', [VideoCallController::class, 'index'])->name('video.call');

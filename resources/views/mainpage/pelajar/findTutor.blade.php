@@ -163,56 +163,102 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 function sewaTutor(tutorId) {
-        // Kirim request ke backend untuk membuat transaksi
-        fetch('/sewa-tutor', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({ tutor_id: tutorId })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                Swal.fire({
-                    title: 'Menunggu Konfirmasi Tutor',
-                    html: `Tutor memiliki waktu 20 Detik detik untuk merespons.`,
-                    timer: 20000, // 10 detik
-                    timerProgressBar: true,
-                    didOpen: () => {
-                        const timerElement = Swal.getHtmlContainer().querySelector('b');
-                        setInterval(() => {
-                            timer--;
-                            timerElement.textContent = timer;
-                        }, 20000);
-                    }
-                }).then((result) => {
-                    if (result.dismiss === Swal.DismissReason.timer) {
-                        // Jika waktu habis, tampilkan pesan
+    // Kirim request ke backend untuk membuat transaksi
+    fetch('/sewa-tutor', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ tutor_id: tutorId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Tampilkan popup timer 20 detik
+            let timer = 20;
+            Swal.fire({
+                title: 'Menunggu Konfirmasi Tutor',
+                html: `Tutor memiliki waktu <b>${timer}</b> detik untuk merespons.`,
+                timer: 20000, // 20 detik
+                timerProgressBar: true,
+                showConfirmButton: false, // Menghilangkan tombol "OK"
+                didOpen: () => {
+                    const timerElement = Swal.getHtmlContainer().querySelector('b');
+                    const timerInterval = setInterval(() => {
+                        timer--;
+                        timerElement.textContent = timer;
+                        if (timer <= 0) {
+                            clearInterval(timerInterval);
+                        }
+                    }, 1000);
+                }
+            }).then((result) => {
+                if (result.dismiss === Swal.DismissReason.timer) {
+                    // Jika waktu habis, tampilkan pesan
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Waktu Habis',
+                        text: 'Tutor tidak merespons dalam waktu yang ditentukan.',
+                        showConfirmButton: true, // Tampilkan tombol "OK" pada pesan ini
+                    });
+                }
+            });
+
+            // Cek status transaksi secara berkala (polling)
+            const checkConfirmation = setInterval(() => {
+                fetch('/check-transaction-status', { // Endpoint untuk memeriksa status transaksi
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ transaction_id: data.transaction_id }) // Kirim transaction_id
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Response from /check-transaction-status:', data); // Debugging
+                    if (data.status === 'confirmed') {
+                        clearInterval(checkConfirmation); // Hentikan polling
+
+                        // Redirect ke halaman video call
+                        window.location.href = data.video_call_url;
+                    } else if (data.status === 'rejected') {
+                        clearInterval(checkConfirmation); // Hentikan polling
+
+                        // Tampilkan pesan penolakan
                         Swal.fire({
                             icon: 'error',
-                            title: 'Waktu Habis',
-                            text: 'Tutor tidak merespons dalam waktu yang ditentukan.',
+                            title: 'Ditolak',
+                            text: 'Tutor menolak permintaan sewa Anda.',
+                            showConfirmButton: true,
                         });
                     }
+                })
+                .catch(error => {
+                    console.error('Error saat memeriksa status transaksi:', error);
                 });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: data.message || 'Terjadi kesalahan saat memproses permintaan.',
-                });
-            }
-        })
-        .catch(error => {
+            }, 3000); // Cek setiap 3 detik
+        } else {
+            // Jika gagal membuat transaksi, tampilkan pesan error
             Swal.fire({
                 icon: 'error',
                 title: 'Oops...',
-                text: 'Terjadi kesalahan saat menghubungi server.',
+                text: data.message || 'Terjadi kesalahan saat memproses permintaan.',
+                showConfirmButton: true, // Tampilkan tombol "OK" pada pesan ini
             });
+        }
+    })
+    .catch(error => {
+        // Jika terjadi error saat mengirim request, tampilkan pesan error
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Terjadi kesalahan saat menghubungi server.',
+            showConfirmButton: true, // Tampilkan tombol "OK" pada pesan ini
         });
-    }
+    });
+}
 </script>
 
 @endsection

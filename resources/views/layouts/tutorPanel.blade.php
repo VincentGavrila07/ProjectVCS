@@ -105,106 +105,100 @@
         }
     });
 
-     // Fungsi untuk mengecek notifikasi baru
-     function checkNotification() {
-        fetch('/check-notification')
-            .then(response => response.json())
-            .then(data => {
-                if (data.has_notification) {
-                    // Tampilkan popup notifikasi
-                    let timer = 10;
-                    Swal.fire({
-                        title: 'Permintaan Sewa',
-                        html: `Anda sedang disewa oleh pelajar. Silakan konfirmasi dalam <b>${timer}</b> detik.`,
-                        timer: 10000, // 10 detik
-                        timerProgressBar: true,
-                        showCancelButton: true,
-                        confirmButtonText: 'Terima',
-                        cancelButtonText: 'Tolak',
-                        didOpen: () => {
-                            const timerElement = Swal.getHtmlContainer().querySelector('b');
-                            const timerInterval = setInterval(() => {
+    function checkNotification() {
+    fetch('/check-notification')
+        .then(response => response.json())
+        .then(data => {
+            if (data.has_notification) {
+                // Tampilkan popup notifikasi
+                let timer = 10;
+                Swal.fire({
+                    title: 'Permintaan Sewa',
+                    html: `Anda sedang disewa oleh pelajar. Silakan konfirmasi dalam <b>${timer}</b> detik.`,
+                    timer: 10000, // 10 detik
+                    timerProgressBar: true,
+                    showCancelButton: true,
+                    confirmButtonText: 'Terima',
+                    cancelButtonText: 'Tolak',
+                    didOpen: () => {
+                        const timerElement = Swal.getHtmlContainer().querySelector('b');
+                        const timerInterval = setInterval(() => {
+                            timer--;
+                            timerElement.textContent = timer;
+                        }, 1000);
+
+                        // Hentikan interval saat popup ditutup
+                        Swal.getPopup().addEventListener('mouseenter', () => {
+                            clearInterval(timerInterval);
+                        });
+                        Swal.getPopup().addEventListener('mouseleave', () => {
+                            timerInterval = setInterval(() => {
                                 timer--;
                                 timerElement.textContent = timer;
                             }, 1000);
+                        });
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Jika tutor menerima
+                        fetch('/confirm-request', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({ transaction_id: data.transaction_id }) // Pastikan transaction_id dikirim
+                        }).then(response => response.json())
+                          .then(data => {
+                              if (data.success) {
+                                  // Redirect ke halaman video call
+                                  window.location.href = data.video_call_url;
+                              } else {
+                                  Swal.fire({
+                                      icon: 'error',
+                                      title: 'Oops...',
+                                      text: data.message || 'Terjadi kesalahan saat memproses permintaan.',
+                                  });
+                              }
+                          });
+                    } else if (result.dismiss === Swal.DismissReason.cancel) {
+                        // Jika tutor menolak
+                        fetch('/reject-request', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({ transaction_id: data.transaction_id })
+                        }).then(response => response.json())
+                          .then(data => {
+                              if (data.success) {
+                                  Swal.fire({
+                                      icon: 'success',
+                                      title: 'Berhasil',
+                                      text: 'Anda telah menolak permintaan sewa.',
+                                  }).then(() => {
+                                      window.location.reload(); // Refresh halaman
+                                  });
+                              } else {
+                                  Swal.fire({
+                                      icon: 'error',
+                                      title: 'Oops...',
+                                      text: data.message || 'Terjadi kesalahan saat memproses permintaan.',
+                                  });
+                              }
+                          });
+                    }
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error saat mengecek notifikasi:', error);
+        });
+}
 
-                            // Hentikan interval saat popup ditutup
-                            Swal.getPopup().addEventListener('mouseenter', () => {
-                                clearInterval(timerInterval);
-                            });
-                            Swal.getPopup().addEventListener('mouseleave', () => {
-                                timerInterval = setInterval(() => {
-                                    timer--;
-                                    timerElement.textContent = timer;
-                                }, 1000);
-                            });
-                        }
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            // Jika tutor menerima
-                            fetch('/confirm-request', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                },
-                                body: JSON.stringify({ transaction_id: data.transaction_id }) // Pastikan transaction_id dikirim
-                            }).then(response => response.json())
-                              .then(data => {
-                                  if (data.success) {
-                                      Swal.fire({
-                                          icon: 'success',
-                                          title: 'Berhasil',
-                                          text: 'Anda telah menerima permintaan sewa.',
-                                      }).then(() => {
-                                          window.location.reload(); // Refresh halaman
-                                      });
-                                  } else {
-                                      Swal.fire({
-                                          icon: 'error',
-                                          title: 'Oops...',
-                                          text: data.message || 'Terjadi kesalahan saat memproses permintaan.',
-                                      });
-                                  }
-                              });
-                        } else if (result.dismiss === Swal.DismissReason.cancel) {
-                            // Jika tutor menolak
-                            fetch('/reject-request', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                },
-                                body: JSON.stringify({ transaction_id: data.transaction_id })
-                            }).then(response => response.json())
-                              .then(data => {
-                                  if (data.success) {
-                                      Swal.fire({
-                                          icon: 'success',
-                                          title: 'Berhasil',
-                                          text: 'Anda telah menolak permintaan sewa.',
-                                      }).then(() => {
-                                          window.location.reload(); // Refresh halaman
-                                      });
-                                  } else {
-                                      Swal.fire({
-                                          icon: 'error',
-                                          title: 'Oops...',
-                                          text: data.message || 'Terjadi kesalahan saat memproses permintaan.',
-                                      });
-                                  }
-                              });
-                        }
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Error saat mengecek notifikasi:', error);
-            });
-    }
-
-    // Cek notifikasi setiap 5 detik
-    setInterval(checkNotification, 5000);
+// Cek notifikasi setiap 5 detik
+setInterval(checkNotification, 5000);
     </script>
 
 </body>
