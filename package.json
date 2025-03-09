@@ -1,6 +1,5 @@
 {
     "private": true,
-    "type": "module",
     "scripts": {
         "dev": "vite",
         "build": "vite build"
@@ -17,5 +16,11 @@
         "tailwindcss": "^4.0.7",
         "vite": "^5.0.0",
         "vue": "^3.2.37"
+    },
+    "dependencies": {
+        "@zoomus/websdk": "^2.18.3",
+        "express": "^4.21.2",
+        "simple-peer": "^9.11.1",
+        "socket.io": "^4.8.1"
     }
 }
