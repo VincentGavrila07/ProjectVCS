@@ -103,14 +103,18 @@
                 @endif
 
                 <!-- Info Bergabung & Rating -->
-                <div class="flex justify-center items-center mt-2 text-gray-500 text-sm">
-                    @if (\Carbon\Carbon::parse($tutor->created_at)->diffInDays(now()) == 0)
-                        <span class="font-bold">Baru saja bergabung</span>
-                    @else
-                        <span class="font-bold">Sejak {{ \Carbon\Carbon::parse($tutor->created_at)->diffInDays(now()) }} hari yang lalu</span>
-                    @endif
-                    <span class="ml-3">👍 97%</span>
-                </div>
+                <!-- Info Bergabung & Rating -->
+<div class="flex justify-center items-center mt-2 text-gray-500 text-sm">
+    @if (\Carbon\Carbon::parse($tutor->created_at)->diffInDays(now()) == 0)
+        <span class="font-bold">Baru saja bergabung</span>
+    @else
+        <span class="font-bold">Sejak {{ \Carbon\Carbon::parse($tutor->created_at)->diffInDays(now()) }} hari yang lalu</span>
+    @endif
+    
+    <span class="ml-3">👍 97%</span>
+</div>
+
+
 
                 <!-- Harga -->
                  @if($tutor->price == null)

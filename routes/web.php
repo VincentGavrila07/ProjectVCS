@@ -62,10 +62,12 @@ Route::post('/loginlogic',  [LoginController::class, 'login'])->name('loginsubmi
 Route::get('/register',  [RegisterController::class, 'showRegister'])->name('register');
 Route::post('/register',  [RegisterController::class, 'register'])->name('registersubmit'); 
 
+Route::get('/profile/pelajar', [ProfileController::class, 'editPelajar'])->name('profile.edit.pelajar');
+Route::get('/profile/tutor', [ProfileController::class, 'editTutor'])->name('profile.edit.tutor');
 
-Route::get('/profile/pelajar', [ProfileController::class, 'edit'])->name('profile.edit.pelajar');
-Route::get('/profile/tutor', [ProfileController::class, 'edit'])->name('profile.edit.tutor');
-Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+Route::put('/profile/pelajar', [ProfileController::class, 'updatePelajar'])->name('profile.update.pelajar');
+Route::put('/profile/tutor', [ProfileController::class, 'updateTutor'])->name('profile.update.tutor');
+
 
 Route::get('/findTutor', [FindTutorController::class, 'index'])->name('findTutor');
 

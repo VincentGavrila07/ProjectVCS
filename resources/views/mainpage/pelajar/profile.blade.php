@@ -9,7 +9,7 @@
         </div>
     @endif
 
-    <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="max-w-lg mx-auto bg-white p-6 rounded shadow">
+    <form action="{{ route('profile.update.pelajar') }}" method="POST" enctype="multipart/form-data" class="max-w-lg mx-auto bg-white p-6 rounded shadow">
         @csrf
         @method('PUT')
 
@@ -30,7 +30,6 @@
 
             @if(session('image'))
                 <div class="mt-2">
-                    <p class="font-medium">Foto Saat Ini:</p>
                     <img src="{{ asset('storage/' . session('image')) }}" alt="Foto Profil" class="w-24 h-24 rounded-full">
                 </div>
             @endif

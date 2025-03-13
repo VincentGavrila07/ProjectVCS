@@ -36,9 +36,12 @@ class LoginController extends Controller
             'username' => $user->username,
             'role' => $user->role,
             'email' => $user->email,
-            'TeacherId' => $user->TeacherId ?? null, // Simpan TeacherId jika ada
-            'image' => $user->image
+            'image' => $user->image,
+            'TeacherId' => $user->TeacherId ?? null,
+            'price' => $user->price ?? null, 
+            'subjectClass' => $user->subjectClass,
         ]);
+        
     
         // Redirect ke halaman yang sesuai berdasarkan role
         // return $user->role == 1

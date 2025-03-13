@@ -33,6 +33,7 @@
 
             <!-- Profile Section -->
             <div class="flex items-center mb-6">
+                
                 <div class="w-16 h-16 rounded-full bg-gray-500 flex items-center justify-center mr-4">
                     @if(session('image'))
                         <img src="{{ asset('storage/' . session('image')) }}" alt="Profile Picture" class="w-16 h-16 rounded-full border-2 border-blue-400 shadow-md">
@@ -53,9 +54,14 @@
                         Dashboard
                     </a>
                 </li>
-                <li>
-                    <a href="{{ route('profile.edit.tutor') }}" class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded {{ Route::is('profile.edit.tutor') ? 'bg-yellow-500' : '' }}">
+                <li class="relative">
+                    <a href="{{ route('profile.edit.tutor') }}" 
+                        class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded 
+                        {{ Route::is('profile.edit.tutor') ? 'bg-yellow-500' : '' }}">
                         Edit Profile
+                        @if(!session('price') || !session('subjectClass') || !session('image'))
+                            <span class="absolute top-2 right-3 w-3 h-3 bg-red-500 rounded-full animate-pulse"></span>
+                        @endif
                     </a>
                 </li>
                 <li>

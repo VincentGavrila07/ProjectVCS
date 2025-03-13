@@ -3,13 +3,18 @@ import ReactDOM from "react-dom/client";
 import Navbar from "./components/navbar";
 import HeroSection from "./components/HeroSection";
 import AboutUs from "./components/AboutUs";
+import Footer from "./components/Footer";
+import TutorGrid from "./components/TutorGrid";
 
 function App() {
     return (
         <>
-            <Navbar /> {/* Pakai huruf kapital di awal */}
+            <Navbar /> 
             <HeroSection/>
+            <TutorGrid/>
+
             <AboutUs/>
+            <Footer/>
 
         </>
     );

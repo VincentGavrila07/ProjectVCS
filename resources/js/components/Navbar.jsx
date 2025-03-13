@@ -73,7 +73,7 @@ const Navbar = () => {
           className="hidden md:block bg-blue-600 text-white px-5 py-2 rounded-lg shadow-md hover:bg-blue-700 transition-transform hover:scale-105"
           whileHover={{ scale: 1.1 }}
         >
-          Masuk/Daftar
+          Masuk / Daftar
         </motion.a>
 
         {/* Mobile Menu Button */}
