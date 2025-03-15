@@ -46,7 +46,20 @@
                     <p class="text-gray-400">{{ session('email') }}</p>
                 </div>
             </div>
-
+            <!-- Toggle Availability -->
+            <div class="flex items-center justify-between mb-4">
+                <span>Pencarian</span>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="availabilityToggle" class="sr-only peer">
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:ring-4 peer-focus:ring-blue-300 
+                        dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 
+                        peer-checked:after:translate-x-full peer-checked:after:border-white 
+                        after:content-[''] after:absolute after:top-0.5 after:left-[2px] 
+                        after:bg-white after:border-gray-300 after:border after:rounded-full 
+                        after:h-5 after:w-5 after:transition-all dark:border-gray-600 
+                        peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
             <!-- Menu -->
             <ul>
                 <li>
@@ -205,7 +218,100 @@
 
 // Cek notifikasi setiap 5 detik
 setInterval(checkNotification, 5000);
-    </script>
+
+
+// isAvailable
+
+document.addEventListener("DOMContentLoaded", function() {
+    const toggleSwitch = document.getElementById("availabilityToggle");
+
+    // Set nilai awal berdasarkan session
+    fetch('/get-tutor-status')
+        .then(response => response.json())
+        .then(data => {
+            toggleSwitch.checked = data.isAvailable;
+        });
+
+    toggleSwitch.addEventListener("change", function() {
+        fetch('/tutor/toggle-availability', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Status Updated",
+                    text: "Availability changed successfully!",
+                    timer: 1500
+                });
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: data.message
+                });
+            }
+        })
+        .catch(error => {
+            console.error("Error updating availability:", error);
+        });
+    });
+});
+
+
+// menangani untuk function afk
+
+document.addEventListener("DOMContentLoaded", function () {
+    let timeout;
+    const toggleSwitch = document.getElementById("availabilityToggle");
+    
+    // Fungsi untuk mengupdate status ke false jika user AFK
+    function setAFK() {
+        fetch('/tutor/set-afk', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Anda AFK",
+                    text: "Anda telah AFK selama 30 menit. Status Anda diubah menjadi tidak tersedia.",
+                    timer: 5000
+                });
+                toggleSwitch.checked = false; // Update tampilan toggle
+            }
+        })
+        .catch(error => console.error("Error setting AFK:", error));
+    }
+
+    // Reset timer setiap ada aktivitas user
+    function resetTimer() {
+        clearTimeout(timeout);
+        timeout = setTimeout(setAFK, 60 * 60 * 1000); // 60 menit
+        // timeout = setTimeout(setAFK, 10 * 1000); // 10 Detik
+    }
+
+    // Event listener untuk aktivitas user
+    document.addEventListener("mousemove", resetTimer);
+    document.addEventListener("keydown", resetTimer);
+    document.addEventListener("click", resetTimer);
+    document.addEventListener("scroll", resetTimer);
+
+    // Mulai hitungan waktu AFK saat pertama kali masuk
+    resetTimer();   
+});
+
+</script>
 
 </body>
 </html>

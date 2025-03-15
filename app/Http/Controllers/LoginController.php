@@ -59,12 +59,26 @@ class LoginController extends Controller
 
     public function logout(Request $request)
     {
-        $request->session()->flush(); // Hapus semua session yang tersimpan
-        $request->session()->invalidate(); // Invalidasi session agar tidak bisa digunakan lagi
-        $request->session()->regenerateToken(); // Regenerasi CSRF token agar aman
-
-        return redirect()->route('login'); // Redirect ke halaman login
+        // Ambil ID tutor dari session sebelum menghapus session
+        $tutorId = session('id');
+    
+        if ($tutorId) {
+            // Update status isAvailable menjadi false
+            $tutor = \App\Models\MsUser::find($tutorId);
+            if ($tutor) {
+                $tutor->isAvailable = false;
+                $tutor->save();
+            }
+        }
+    
+        // Hapus semua session
+        $request->session()->flush();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+    
+        return redirect()->route('login');
     }
+    
 
     
 

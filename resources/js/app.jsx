@@ -5,6 +5,7 @@ import HeroSection from "./components/HeroSection";
 import AboutUs from "./components/AboutUs";
 import Footer from "./components/Footer";
 import TutorGrid from "./components/TutorGrid";
+import Forum from "./components/Forum";
 
 function App() {
     return (
@@ -14,6 +15,7 @@ function App() {
             <TutorGrid/>
 
             <AboutUs/>
+            <Forum/>
             <Footer/>
 
         </>

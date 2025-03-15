@@ -33,6 +33,7 @@ class RegisterController extends Controller
             'password' => Hash::make($request->password),
             'role' => $request->role,
             'TeacherId' => $request->role == 1 ? 'T-' . str_pad(rand(1, 99999), 5, '0', STR_PAD_LEFT) : null,
+            'isAvailable' => false,
         ]);
     
         return redirect('/login')->with('success', 'Registrasi berhasil, silakan login.');

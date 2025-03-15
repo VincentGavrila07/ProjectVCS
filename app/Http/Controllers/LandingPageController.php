@@ -11,6 +11,7 @@ class LandingPageController extends Controller
     {
         $tutors = DB::table('msuser')
             ->where('role', 1)
+            ->where('isAvailable',1)
             ->leftJoin('mssubject', 'msuser.subjectClass', '=', 'mssubject.id')
             ->select(
                 'msuser.id',

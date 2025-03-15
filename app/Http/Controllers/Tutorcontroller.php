@@ -16,6 +16,60 @@ use GuzzleHttp\Client;
 
 class TutorController extends Controller
 {
+
+    public function toggleAvailability(Request $request)
+    {
+        // Ambil ID tutor dari session
+        $tutorId = session('id');
+
+        if (!$tutorId) {
+            return response()->json(['success' => false, 'message' => 'User not found'], 403);
+        }
+
+        // Temukan user berdasarkan session
+        $tutor = MsUser::find($tutorId);
+
+        if (!$tutor) {
+            return response()->json(['success' => false, 'message' => 'Tutor not found'], 404);
+        }
+
+        // Toggle status isAvailable
+        $tutor->isAvailable = !$tutor->isAvailable;
+        $tutor->save();
+
+        return response()->json([
+            'success' => true,
+            'isAvailable' => $tutor->isAvailable
+        ]);
+    }
+
+    public function setAFK(Request $request)
+    {
+        // Ambil ID tutor dari session
+        $tutorId = session('id');
+
+        if (!$tutorId) {
+            return response()->json(['success' => false, 'message' => 'User not found'], 403);
+        }
+
+        // Temukan tutor berdasarkan session
+        $tutor = MsUser::find($tutorId);
+
+        if (!$tutor) {
+            return response()->json(['success' => false, 'message' => 'Tutor not found'], 404);
+        }
+
+        // Set status isAvailable ke false
+        $tutor->isAvailable = false;
+        $tutor->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tutor is now AFK'
+        ]);
+    }
+
+
     public function sewaTutor(Request $request)
 {
     $studentId = session('id'); // Ambil ID pelajar dari session

@@ -70,6 +70,15 @@ Route::put('/profile/tutor', [ProfileController::class, 'updateTutor'])->name('p
 
 
 Route::get('/findTutor', [FindTutorController::class, 'index'])->name('findTutor');
+Route::get('/get-tutors', [FindTutorController::class, 'getTutors'])->name('tutors.get');
+
+Route::post('/tutor/toggle-availability', [TutorController::class, 'toggleAvailability']);
+Route::get('/get-tutor-status', function () {
+    $tutor = \App\Models\MsUser::find(session('id'));
+    return response()->json(['isAvailable' => $tutor ? $tutor->isAvailable : false]);
+});
+Route::post('/tutor/set-afk', [TutorController::class, 'setAFK'])->name('tutor.setAFK');
+
 
 Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
 Route::get('/chat/{room_id}', [ChatController::class, 'showRoom'])->name('chat.room');
@@ -79,9 +88,7 @@ Route::get('/chat/create/{tutor_id}', [ChatController::class, 'createRoom'])->na
 
 Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
 Route::post('/wallet/deposit', [WalletController::class, 'deposit'])->name('wallet.deposit');
-Route::post('/wallet/handle-notification', [WalletController::class, 'handleNotification'])->name('wallet.handle.notification');
-
-
+Route::match(['get', 'post'], '/wallet/handle-notification', [WalletController::class, 'handleNotification'])->name('wallet.handle.notification');
 
 
     Route::post('/sewa-tutor', [TutorController::class, 'sewaTutor'])->name('sewa.tutor');
