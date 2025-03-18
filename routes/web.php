@@ -42,6 +42,10 @@ Route::middleware(['check.session'])->group(function () {
     Route::delete('/admin/pelajar/{id}', [AdminController::class, 'deletePelajar'])->name('deletePelajar');
     Route::get('/admin/transaksiList', [AdminController::class, 'transaksiList'])->name('transaksiList');
     Route::delete('/admin/transactions/{id}', [AdminController::class, 'destroyTransaction'])->name('transactions.destroy');
+    Route::get('/admin/subjectList', [AdminController::class, 'subjectList'])->name('subjectList');
+    Route::post('/subject/store', [AdminController::class, 'store'])->name('subject.store');
+    Route::put('/subject/update/{id}', [AdminController::class, 'update'])->name('subject.update');
+    Route::delete('/admin/subject/{id}', [AdminController::class, 'destroySubject'])->name('subject.destroy');
     // ------------------------------------------- User Routes -------------------------------------------
     Route::get('/pelajar', function () {
         return view('mainpage/pelajar/index');

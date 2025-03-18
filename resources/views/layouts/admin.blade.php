@@ -21,7 +21,7 @@
 </style>
 <body class="bg-gray-100">
 
-    <div class="flex h-screen">
+    <div class="flex min-h-screen">
         <!-- Sidebar -->
         <div id="sidebar" class="w-64 bg-gray-800 text-white p-6 fixed inset-y-0 left-0 transform -translate-x-full transition-transform duration-300 ease-in-out md:translate-x-0 md:sticky md:top-0 md:h-screen">
             <!-- Profile Section -->
@@ -71,6 +71,11 @@
                 <li>
                     <a href="{{ route('transaksiList') }}" class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded {{ Request::is('admin/transaksiList') ? 'bg-yellow-500' : '' }}">
                         Daftar Transaksi
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('subjectList') }}" class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded {{ Request::is('admin/subjectList') ? 'bg-yellow-500' : '' }}">
+                        Daftar Subject
                     </a>
                 </li>
                 <li>

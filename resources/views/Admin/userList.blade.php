@@ -49,7 +49,7 @@
                     <tr>
                         <td class="border border-gray-300 px-4 py-2">{{ $user->id }}</td>
                         <td class="border border-gray-300 px-4 py-2">{{ $user->username }}</td>
-                        <td class="border border-gray-300 px-4 py-2">{{ $user->role }}</td>
+                        <td class="border border-gray-300 px-4 py-2">{{ $user->role_name ?? 'Tidak ada role' }}</td>
                         <td class="border border-gray-300 px-4 py-2">{{ $user->email }}</td>
                     </tr>
                 @endforeach

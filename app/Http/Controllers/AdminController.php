@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MsUser;
 use App\Models\Transaction;
+use App\Models\MsSubject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -22,60 +23,80 @@ class AdminController extends Controller
 
     public function userList(Request $request)
     {
-        // Ambil data user dengan kondisi pencarian jika ada
-        $query = MsUser::query()
-        ->whereNot('role',3);
+        // Query data user dan join dengan msrole untuk mendapatkan nama role
+        $query = DB::table('msuser')
+            ->whereNot('msuser.role', 3)
+            ->leftJoin('msrole', 'msuser.role', '=', 'msrole.id') // Join ke msrole
+            ->select('msuser.*', 'msrole.name as role_name'); // Ambil semua data msuser + role_name
     
+        // Filter pencarian jika ada
         if ($request->has('search')) {
             $search = $request->input('search');
-            $query->where('id', 'LIKE', "%{$search}%")
-            ->orwhere('username', 'like', '%' . $search . '%')
-                  ->orWhere('role', 'like', '%' . $search . '%')
-                  ->orWhere('email', 'like', '%' . $search . '%');
+            $query->where(function ($q) use ($search) {
+                $q->where('msuser.id', 'LIKE', "%{$search}%")
+                    ->orWhere('msuser.username', 'LIKE', "%{$search}%")
+                    ->orWhere('msrole.name', 'LIKE', "%{$search}%") // Cari berdasarkan nama role
+                    ->orWhere('msuser.email', 'LIKE', "%{$search}%");
+            });
         }
     
-        // Menangani pengurutan berdasarkan kolom dan arah
+        // Sorting jika ada request sort
         if ($request->has('sort')) {
             $sortColumn = $request->input('sort');
-            $sortOrder = $request->input('order', 'asc'); // Default adalah ascending
+            $sortOrder = $request->input('order', 'asc'); // Default ascending
             $query->orderBy($sortColumn, $sortOrder);
         }
     
-        // Ambil data user
+        // Ambil data dengan pagination
         $users = $query->paginate(10);
     
         // Kirim data ke view
         return view('admin.userList', compact('users'));
     }
+    
 
+    
     public function tutorList(Request $request)
     {
-        // Ambil data user dengan kondisi pencarian jika ada
-        $query = MsUser::query()
-        ->where('role', 1);
-    
-        if ($request->has('search')) {
+        // Ambil data tutor dengan LEFT JOIN ke mssubject dan wallet
+        $query = DB::table('msuser')
+            ->where('msuser.role', 1)
+            ->leftJoin('mssubject', 'msuser.subjectClass', '=', 'mssubject.id')
+            ->leftJoin('wallets', 'msuser.id', '=', 'wallets.user_id') // Join ke wallet
+            ->select(
+                'msuser.*', 
+                'mssubject.subjectName as subject_name',
+                'wallets.balance as wallet_balance' // Ambil saldo wallet
+            );
+
+        // Filter berdasarkan pencarian (search)
+        if ($request->has('search') && $request->search != '') {
             $search = $request->input('search');
-            $query->where('id', 'LIKE', "%{$search}%")
-                ->orwhere('username', 'like', '%' . $search . '%')
-                  ->orWhere('role', 'like', '%' . $search . '%')
-                  ->orWhere('email', 'like', '%' . $search . '%');
+            $query->where(function ($q) use ($search) {
+                $q->where('msuser.id', 'LIKE', "%{$search}%")
+                ->orWhere('msuser.username', 'LIKE', "%{$search}%")
+                ->orWhere('msuser.email', 'LIKE', "%{$search}%")
+                ->orWhere('mssubject.subjectName', 'LIKE', "%{$search}%")
+                ->orWhere('wallets.balance', 'LIKE', "%{$search}%"); // Tambahkan pencarian berdasarkan saldo wallet
+            });
         }
-    
-        // Menangani pengurutan berdasarkan kolom dan arah
+
+        // Sorting berdasarkan kolom tertentu
         if ($request->has('sort')) {
             $sortColumn = $request->input('sort');
-            $sortOrder = $request->input('order', 'asc'); // Default adalah ascending
+            $sortOrder = $request->input('order', 'asc'); // Default ascending
             $query->orderBy($sortColumn, $sortOrder);
         }
-    
-        // Ambil data user
+
+        // Ambil data dengan pagination (10 per halaman)
         $users = $query->paginate(10);
-    
+
         // Kirim data ke view
         return view('admin.tutorList', compact('users'));
     }
 
+    
+    
     public function deleteTutor($id)
     {
         try {
@@ -101,30 +122,36 @@ class AdminController extends Controller
     
     public function pelajarList(Request $request)
     {
-        // Ambil data user dengan kondisi pencarian jika ada
-        $query = MsUser::query()
-        ->where('role', 2);
-    
+        // Query data user (role = 2) dan join dengan wallet untuk mendapatkan balance
+        $query = DB::table('msuser')
+            ->where('msuser.role', 2)
+            ->leftJoin('wallets', 'msuser.id', '=', 'wallets.user_id') // Join ke wallet
+            ->select('msuser.*', 'wallets.balance as wallet_balance'); // Ambil balance dari wallet
+
+        // Filter pencarian jika ada
         if ($request->has('search')) {
             $search = $request->input('search');
-            $query->where('id', 'LIKE', "%{$search}%")
-                ->orwhere('username', 'like', '%' . $search . '%')
-                  ->orWhere('role', 'like', '%' . $search . '%')
-                  ->orWhere('email', 'like', '%' . $search . '%');
+            $query->where(function ($q) use ($search) {
+                $q->where('msuser.id', 'LIKE', "%{$search}%")
+                    ->orWhere('msuser.username', 'LIKE', "%{$search}%")
+                    ->orWhere('msuser.email', 'LIKE', "%{$search}%");
+            });
         }
-    
+
         // Menangani pengurutan berdasarkan kolom dan arah
         if ($request->has('sort')) {
             $sortColumn = $request->input('sort');
-            $sortOrder = $request->input('order', 'asc'); // Default adalah ascending
+            $sortOrder = $request->input('order', 'asc'); // Default ascending
             $query->orderBy($sortColumn, $sortOrder);
         }
-    
-        // Ambil data user
+
+        // Ambil data dengan pagination
         $users = $query->paginate(10);
-    
+
+        // Kirim data ke view
         return view('admin.pelajarList', compact('users'));
     }
+
 
     public function deletePelajar($id)
     {
@@ -178,9 +205,65 @@ class AdminController extends Controller
     }
 
 
+    public function subjectList(Request $request)
+    {
+        $query = MsSubject::query();
+
+        // Cek apakah ada pencarian berdasarkan student_id atau tutor_id
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $query->where('id', 'LIKE', "%{$search}%")
+                ->orwhere('subjectName', 'LIKE', "%{$search}%");
+        }
+
+        $subject = $query->orderBy('id', 'desc')->paginate(10);
+
+        return view('admin.subject', compact('subject'));
+    }
+
+    public function destroySubject($id)
+    {
+        $subject = MsSubject::find($id);
+
+        if (!$subject) {
+            return response()->json(['success' => false, 'message' => 'Subject tidak ditemukan.'], 404);
+        }
+
+        DB::table('msuser')->where('subjectClass', $id)->update(['subjectClass' => null]);
+
+        // Pastikan hanya menghapus subject, bukan tutor
+        DB::table('transactions')->where('subject_id', $id)->delete(); 
+
+        // Hapus subject setelah data terkait dihapus
+        $subject->delete();
+
+        return response()->json(['success' => true, 'message' => 'Subject berhasil dihapus.']);
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'subjectName' => 'required|string|max:255'
+        ]);
+
+        MsSubject::create([
+            'subjectName' => $request->subjectName
+        ]);
+
+        return back()->with('success', 'Subject berhasil ditambahkan!');
+    }
+
+    public function update(Request $request, $id)
+    {
+        $subject = MsSubject::findOrFail($id);
+        $subject->update(['subjectName' => $request->subjectName]);
+
+        return response()->json(['success' => true]);
+    }
 
 
-    
-    
-    
+
+
+
+
 }

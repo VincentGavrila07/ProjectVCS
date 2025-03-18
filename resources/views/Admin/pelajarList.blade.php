@@ -31,7 +31,7 @@
                         </button>
                     </th>
                     <th class="border border-gray-300 px-4 py-2 text-left">
-                        Role
+                        wallet
                         <button type="submit" name="sort" value="role" class="ml-2 text-blue-500">
                             <i class="fas fa-sort"></i>
                         </button>
@@ -50,7 +50,9 @@
                     <tr>
                         <td class="border border-gray-300 px-4 py-2">{{ $user->id }}</td>
                         <td class="border border-gray-300 px-4 py-2">{{ $user->username }}</td>
-                        <td class="border border-gray-300 px-4 py-2">{{ $user->role }}</td>
+                        <td class="border border-gray-300 px-4 py-2">
+                            Rp {{ number_format($user->wallet_balance ?? 0, 0, ',', '.') }}
+                        </td>
                         <td class="border border-gray-300 px-4 py-2">{{ $user->email }}</td>
                         <td class="border border-gray-300 px-2 py-2 text-center">
                             <button onclick="return confirmDelete('{{ $user->id }}');" class="bg-red-500 text-white px-4 py-2 rounded-lg">

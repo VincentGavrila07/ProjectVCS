@@ -37,6 +37,18 @@
                         </button>
                     </th>
                     <th class="border border-gray-300 px-4 py-2 text-left">
+                        Subject
+                        <button type="submit" name="sort" value="role" class="ml-2 text-blue-500">
+                            <i class="fas fa-sort"></i>
+                        </button>
+                    </th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">
+                        Wallet
+                        <button type="submit" name="sort" value="role" class="ml-2 text-blue-500">
+                            <i class="fas fa-sort"></i>
+                        </button>
+                    </th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">
                         Email
                         <button type="submit" name="sort" value="email" class="ml-2 text-blue-500">
                             <i class="fas fa-sort"></i>
@@ -51,13 +63,18 @@
                         <td class="border border-gray-300 px-4 py-2">{{ $user->id }}</td>
                         <td class="border border-gray-300 px-4 py-2">{{ $user->username }}</td>
                         <td class="border border-gray-300 px-4 py-2">{{ $user->TeacherId }}</td>
+                        <td class="border border-gray-300 px-4 py-2">
+                            {{ optional($user)->subject_name ?? 'Tidak ada mata pelajaran' }}
+                        </td>
+                        <td class="border border-gray-300 px-4 py-2">
+                            Rp {{ number_format($user->wallet_balance ?? 0, 0, ',', '.') }}
+                        </td>
                         <td class="border border-gray-300 px-4 py-2">{{ $user->email }}</td>
                         <td class="border border-gray-300 px-2 py-2 text-center">
                             <button onclick="return confirmDelete('{{ $user->id }}');" class="bg-red-500 text-white px-4 py-2 rounded-lg">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </td>
-
                     </tr>
                 @endforeach
             </tbody>
