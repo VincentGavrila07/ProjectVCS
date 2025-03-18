@@ -46,6 +46,12 @@ Route::middleware(['check.session'])->group(function () {
     Route::post('/subject/store', [AdminController::class, 'store'])->name('subject.store');
     Route::put('/subject/update/{id}', [AdminController::class, 'update'])->name('subject.update');
     Route::delete('/admin/subject/{id}', [AdminController::class, 'destroySubject'])->name('subject.destroy');
+    Route::get('/admin/withdrawList', [AdminController::class, 'withdrawList'])->name('withdrawList');
+    // Route untuk membuka halaman edit withdraw
+    Route::get('/withdraw/edit/{id}', [WalletController::class, 'editWithdraw'])->name('withdraw.edit');
+    Route::put('/withdraw/update/{id}', [WalletController::class, 'updateWithdrawStatus'])->name('withdraw.update');
+
+
     // ------------------------------------------- User Routes -------------------------------------------
     Route::get('/pelajar', function () {
         return view('mainpage/pelajar/index');
@@ -83,7 +89,12 @@ Route::middleware(['check.session'])->group(function () {
     
     // ------------------------------------------- Wallet Routes -------------------------------------------
     Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
+    Route::get('/wallet-tutor', [WalletController::class, 'walletTutor'])->name('tutor.wallet');
+    Route::get('/wallet-pelajar', [WalletController::class, 'walletPelajar'])->name('pelajar.wallet');
     Route::post('/wallet/deposit', [WalletController::class, 'deposit'])->name('wallet.deposit');
+    Route::post('/wallet-tutor/withdraw', [WalletController::class, 'processWithdrawTutor'])->name('tutor.withdraw.process');
+    Route::post('/wallet-pelajar/withdraw', [WalletController::class, 'processWithdrawPelajar'])->name('pelajar.withdraw.process');
+    
     
     // ------------------------------------------- Video Call Routes -------------------------------------------
     Route::get('/video-call/{transaction_id}', [VideoCallController::class, 'index'])->name('video.call');

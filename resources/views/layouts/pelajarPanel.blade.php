@@ -74,7 +74,13 @@
                 <li>
                     <a href="{{ route('wallet.index') }}" class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded 
                         {{ Route::is('wallet.index') ? 'bg-yellow-500' : '' }}">
-                        Wallet
+                        Deposit
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('pelajar.wallet') }}" class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded 
+                        {{ Route::is('pelajar.wallet') ? 'bg-yellow-500' : '' }}">
+                        Withdraw
                     </a>
                 </li>
                 <li>

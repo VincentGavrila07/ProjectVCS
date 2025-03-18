@@ -220,7 +220,7 @@ class AdminController extends Controller
 
         return view('admin.subject', compact('subject'));
     }
-
+    
     public function destroySubject($id)
     {
         $subject = MsSubject::find($id);
@@ -228,42 +228,77 @@ class AdminController extends Controller
         if (!$subject) {
             return response()->json(['success' => false, 'message' => 'Subject tidak ditemukan.'], 404);
         }
-
+        
         DB::table('msuser')->where('subjectClass', $id)->update(['subjectClass' => null]);
-
+        
         // Pastikan hanya menghapus subject, bukan tutor
         DB::table('transactions')->where('subject_id', $id)->delete(); 
-
+        
         // Hapus subject setelah data terkait dihapus
         $subject->delete();
-
+        
         return response()->json(['success' => true, 'message' => 'Subject berhasil dihapus.']);
     }
-
+    
     public function store(Request $request)
     {
         $request->validate([
             'subjectName' => 'required|string|max:255'
         ]);
-
+        
         MsSubject::create([
             'subjectName' => $request->subjectName
         ]);
-
+        
         return back()->with('success', 'Subject berhasil ditambahkan!');
     }
-
+    
     public function update(Request $request, $id)
     {
         $subject = MsSubject::findOrFail($id);
         $subject->update(['subjectName' => $request->subjectName]);
-
+        
         return response()->json(['success' => true]);
     }
+    
 
-
-
-
-
-
+    public function withdrawList(Request $request)
+    {
+        $query = DB::table('MsWithdraw')
+            ->join('MsUser', 'MsWithdraw.user_id', '=', 'MsUser.id')
+            ->select(
+                'MsWithdraw.id',
+                'MsUser.username',
+                'MsWithdraw.bank_name',
+                'MsUser.email',
+                'MsWithdraw.amount',
+                'MsWithdraw.status',
+                'MsWithdraw.created_at'
+            );
+    
+        // Pencarian
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('MsWithdraw.id', 'like', "%$search%")
+                  ->orWhere('MsUser.username', 'like', "%$search%")
+                  ->orWhere('MsUser.email', 'like', "%$search%")
+                  ->orWhere('MsUser.bank_name', 'like', "%$search%")
+                  ->orWhere('MsWithdraw.amount', 'like', "%$search%");
+            });
+        }
+    
+        // Sorting
+        $sortColumn = $request->input('sort', 'MsWithdraw.id'); // Default sort by ID
+        $query->orderBy($sortColumn, 'asc');
+    
+        // Ambil data dengan pagination
+        $withdraws = $query->paginate(10);
+    
+        return view('admin.withdrawReq', compact('withdraws'));
+    }
+    
+    
+    
+    
+    
 }

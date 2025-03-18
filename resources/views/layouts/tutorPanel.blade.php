@@ -84,6 +84,12 @@
                     </a>
                 </li>
                 <li>
+                    <a href="{{ route('tutor.wallet') }}" class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded 
+                        {{ request()->routeIs('tutor.wallet') ? 'bg-yellow-500' : '' }}">
+                        Withdraw
+                    </a>
+                </li>
+                <li>
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
                         <button type="submit" class="w-full text-left block py-2 px-4 mt-2 hover:bg-red-600 rounded">
