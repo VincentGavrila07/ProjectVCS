@@ -64,7 +64,7 @@
                 <button type="submit" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600">
                     Terapkan Filter
                 </button>
-                <a href="{{ route('findTutor') }}" class="ml-2 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600">
+                <a href="{{ route('findTutor') }}" id="resetFilterBtn" class="ml-2 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600">
                         Reset Filter
                 </a>
                 <!-- Floating Button -->
@@ -84,9 +84,20 @@
     </div>
 
 <script>
-// ajax untuk real time tutor tanpa harus refresh
+
+window.onpageshow = function(event) {
+        if (event.persisted) {
+            location.reload(); // Refresh halaman jika user kembali dengan tombol "Back"
+        }
+    };
+    
 document.addEventListener("DOMContentLoaded", function () {
+    let isFiltering = false;
+    let intervalId;
+
     function loadTutors() {
+        if (isFiltering) return; // Jangan jalankan jika sedang filter
+
         fetch("{{ route('tutors.get') }}")
             .then(response => response.text())
             .then(html => {
@@ -95,8 +106,44 @@ document.addEventListener("DOMContentLoaded", function () {
             .catch(error => console.error("Error loading tutors:", error));
     }
 
-    // Refresh daftar tutor setiap 5 detik
-    setInterval(loadTutors, 5000);
+    function startAutoRefresh() {
+        if (intervalId) clearInterval(intervalId);
+        intervalId = setInterval(loadTutors, 5000); // Set auto-refresh setiap 5 detik
+    }
+
+    function stopAutoRefresh() {
+        if (intervalId) clearInterval(intervalId); // Matikan interval auto-refresh
+    }
+
+    // Cek apakah ada filter aktif di URL saat pertama kali halaman dimuat
+    const urlParams = new URLSearchParams(window.location.search);
+    isFiltering = urlParams.has("search") || urlParams.has("min_price") || urlParams.has("max_price") || urlParams.has("min_experience") || urlParams.has("subject");
+
+    if (!isFiltering) {
+        startAutoRefresh(); // Jika tidak ada filter, mulai auto-refresh
+    }
+
+    // Saat filter disubmit, matikan auto-refresh
+    document.getElementById("filterisasi").addEventListener("submit", function () {
+        isFiltering = true;
+        stopAutoRefresh();
+    });
+
+    // Saat reset filter, aktifkan kembali auto-refresh dan load tutors
+    document.querySelector("#resetFilterBtn").addEventListener("click", function (event) {
+        event.preventDefault(); // Mencegah reload halaman
+
+        // Kosongkan semua input filter
+        document.querySelector('input[name="search"]').value = "";
+        document.querySelector('input[name="min_price"]').value = "";
+        document.querySelector('input[name="max_price"]').value = "";
+        document.querySelector('select[name="min_experience"]').value = "";
+        document.querySelector('select[name="subject"]').value = "";
+
+        isFiltering = false;
+        startAutoRefresh(); // Memulai auto-refresh kembali setelah reset filter
+        loadTutors(); // Memuat ulang daftar tutor setelah reset filter
+    });
 });
 
 

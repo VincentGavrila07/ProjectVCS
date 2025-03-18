@@ -6,7 +6,7 @@
     <!-- Panel Pencarian -->
     <form method="GET" action="{{ route('tutorList') }}" class="mb-4">
         <div class="flex items-center">
-            <input type="text" name="search" value="{{ request()->input('search') }}" placeholder="Cari berdasarkan nama, role, atau email" class="border px-4 py-2 rounded-lg mr-2 w-96">
+            <input type="text" name="search" value="{{ request()->input('search') }}" placeholder="Cari berdasarkan id, nama, role, atau email" class="border px-4 py-2 rounded-lg mr-2 w-96">
             <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">
                 <i class="fas fa-search"></i> <!-- Ikon search -->
             </button>

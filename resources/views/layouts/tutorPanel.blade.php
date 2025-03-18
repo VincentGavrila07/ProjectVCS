@@ -110,6 +110,12 @@
     const toggleButton = document.getElementById('toggleSidebar');
     const toggleIcon = document.getElementById('toggleIcon');
 
+    window.onpageshow = function(event) {
+        if (event.persisted) {
+            location.reload(); // Refresh halaman jika user kembali dengan tombol "Back"
+        }
+    };
+
     toggleButton.addEventListener('click', function () {
         if (sidebar.classList.contains('-translate-x-full')) {
             sidebar.classList.remove('-translate-x-full');
@@ -297,7 +303,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Reset timer setiap ada aktivitas user
     function resetTimer() {
         clearTimeout(timeout);
-        timeout = setTimeout(setAFK, 60 * 60 * 1000); // 60 menit
+        timeout = setTimeout(setAFK, 30 * 60 * 1000); // 30 menit
         // timeout = setTimeout(setAFK, 10 * 1000); // 10 Detik
     }
 

@@ -176,7 +176,8 @@ public function confirmRequest(Request $request)
             ]);
             return response()->json(['success' => false, 'message' => 'Data pelajar atau tutor tidak ditemukan.']);
         }
-
+        $tutor->isAvailable = !$tutor->isAvailable;
+        $tutor->save();
         // Buat meeting Zoom
         $client = new Client();
         $clientId = env('ZOOM_CLIENT_ID');

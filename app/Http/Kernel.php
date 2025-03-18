@@ -13,6 +13,14 @@ class Kernel extends HttpKernel
      *
      * @var array<int, class-string|string>
      */
+
+     protected $routeMiddleware = [
+        'check.session' => \App\Http\Middleware\CheckSession::class,
+        'checkRole' => \App\Http\Middleware\CheckRoleMiddleware::class,
+    ];
+
+    
+    
     protected $middleware = [
         // \App\Http\Middleware\TrustHosts::class,
         \App\Http\Middleware\TrustProxies::class,
