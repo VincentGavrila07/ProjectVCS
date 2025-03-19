@@ -21,7 +21,6 @@
                 <th class="border border-gray-300 px-4 py-2">Student Name</th>
                 <th class="border border-gray-300 px-4 py-2">Link Zoom</th>
                 <th class="border border-gray-300 px-4 py-2">Amount</th>
-                <th class="border border-gray-300 px-4 py-2">Status</th>
                 <th class="border border-gray-300 px-4 py-2">Status VCS</th>
                 <th class="border border-gray-300 px-4 py-2">Dibuat</th>
             </tr>
@@ -33,7 +32,6 @@
                     <td class="border border-gray-300 px-4 py-2">{{ $transaction->student_name }}</td>
                     <td class="border border-gray-300 px-4 py-2">{{ $transaction->meeting_url ?? 'Tidak Ada Meeting Url' }}</td>
                     <td class="border border-gray-300 px-4 py-2">{{ number_format($transaction->amount, 0, ',', '.') }}</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ ucfirst($transaction->status) }}</td>
                     <td class="border border-gray-300 px-4 py-2">
                         @php
                             $createdTime = strtotime($transaction->created_at);
