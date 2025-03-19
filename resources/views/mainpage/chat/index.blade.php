@@ -13,40 +13,27 @@
         <!-- Buat daftar chat bisa di-scroll -->
         <div class="flex-1 overflow-y-auto max-h-[60vh] pr-2">
             <ul id="chatList">
-                @if($chatRooms->count() == 0)
-                    <li class="text-center text-gray-500 py-4">
-                        Chat Room Tidak Ditemukan
-                    </li>
-                @else
-                    @foreach($chatRooms as $room)
-                        <li class="chat-item relative">
-                            <a href="{{ route('chat.room', $room->id) }}" 
-                            class="flex items-center p-4 border-b hover:bg-gray-100 rounded-lg transition">
-                                <!-- Gambar Profil -->
-                                <div class="w-16 h-16 overflow-hidden rounded-full border">
-                                    @php
-                                        $profileImage = session('role') == 2 
-                                            ? optional($room->tutor)->image 
-                                            : optional($room->student)->image;
-                                    @endphp
-                                    <img src="{{ $profileImage ? asset('storage/' . $profileImage) : asset('images/user.jpg') }}" 
-                                        alt="Profile Picture" class="w-full h-full object-cover">
-                                </div>
-
-                                <!-- Informasi Chat -->
-                                <div class="ml-4 flex-1">
-                                    <p class="font-semibold text-lg">
-                                        {{ session('role') == 2 ? optional($room->tutor)->username : optional($room->student)->username }}
-                                    </p>
-                                    <p class="text-base text-gray-600 truncate">
-                                        {{ optional($room->lastMessage)->message ?? 'Belum ada pesan' }}
-                                    </p>
-                                </div>
-
-                                <!-- Waktu Pesan Terakhir -->
-                                <span class="text-sm text-gray-500">
-                                    {{ optional($room->lastMessage)->created_at ? optional($room->lastMessage)->created_at->diffForHumans() : '' }}
-                                </span>
+            @if($chatRooms->isEmpty())
+                <p class="text-center text-gray-500 font-semibold p-4">Belum Ada Chat</p>
+            @else
+                @foreach($chatRooms as $room)
+                    <li class="chat-item relative">
+                        <a href="{{ route('chat.room', $room->id) }}" 
+                        class="flex items-center p-4 border-b hover:bg-gray-100 rounded-lg transition">
+                            <div class="w-16 h-16 overflow-hidden rounded-full border">
+                                @php
+                                    $profileImage = session('role') == 2 
+                                        ? optional($room->tutor)->image 
+                                        : optional($room->student)->image;
+                                @endphp
+                                <img src="{{ $profileImage ? asset('storage/' . $profileImage) : asset('images/user.jpg') }}" 
+                                    alt="Profile Picture" class="w-16 h-16 rounded-full border-2 border-gray-400">
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <p class="font-semibold text-lg">{{ session('role') == 2 ? optional($room->tutor)->username : optional($room->student)->username }}</p>
+                                <p class="text-base text-gray-600 truncate">{{ optional($room->lastMessage)->message ?? 'Belum ada pesan' }}</p>
+                            </div>
+                            <span class="text-sm text-gray-500">{{ optional($room->lastMessage)->created_at ? optional($room->lastMessage)->created_at->diffForHumans() : '' }}</span>
 
                             <!-- Notifikasi pesan baru -->
                             @if($room->newMessagesCount > 0)
@@ -57,6 +44,8 @@
                         </a>
                     </li>
                 @endforeach
+            @endif
+
             </ul>
         </div>
 
