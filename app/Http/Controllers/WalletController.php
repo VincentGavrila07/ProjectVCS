@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Wallet;
 use App\Models\WalletTransaction;
+use App\Models\MsWithdraw;
 use Midtrans\Config;
 use Midtrans\Snap;
 use Illuminate\Support\Facades\DB;
@@ -27,9 +28,129 @@ class WalletController extends Controller
         }
 
         $wallet = Wallet::firstOrCreate(['user_id' => $userId], ['balance' => 0]);
+        $withdraws = MsWithdraw::where('user_id', $userId)->orderBy('created_at', 'desc')->get();
 
-        return view('mainpage.wallet.index', compact('wallet'));
+        return view('mainpage.wallet.index', compact('wallet','withdraws'));
     }
+    public function walletTutor()
+    {
+        $userId = session('id'); 
+        if (!$userId) {
+            return redirect()->route('login')->with('error', 'Anda harus login terlebih dahulu.');
+        }
+    
+        $wallet = Wallet::firstOrCreate(['user_id' => $userId], ['balance' => 0]);
+        
+        // Ambil riwayat withdraw tutor
+        $withdraws = MsWithdraw::where('user_id', $userId)->orderBy('created_at', 'desc')->get();
+    
+        return view('mainpage.tutor.wallet', compact('wallet', 'withdraws'));
+    }
+    public function walletPelajar()
+    {
+        $userId = session('id'); 
+        if (!$userId) {
+            return redirect()->route('login')->with('error', 'Anda harus login terlebih dahulu.');
+        }
+    
+        $wallet = Wallet::firstOrCreate(['user_id' => $userId], ['balance' => 0]);
+        
+        // Ambil riwayat withdraw tutor
+        $withdraws = MsWithdraw::where('user_id', $userId)->orderBy('created_at', 'desc')->get();
+    
+        return view('mainpage.pelajar.wallet', compact('wallet', 'withdraws'));
+    }
+    
+
+
+
+    public function requestWithdraw(Request $request)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:10000', // Minimal withdraw Rp10.000
+            'bank_name' => 'required|string',
+            'account_number' => 'required|string',
+            'account_name' => 'required|string',
+        ]);
+
+        $userId = session('id');
+
+        $email = DB::table('MsUser')
+            ->where('id', $userId)
+            ->value('email'); // Mengambil satu nilai email
+
+        MsWithdraw::create([
+            'user_id' => $userId,
+            'amount' => $request->amount,
+            'bank_name' => $request->bank_name,
+            'account_number' => $request->account_number,
+            'account_name' => $request->account_name,
+            'status' => 'processing' // Status default processing
+        ]);
+
+        return back()->with('success', 'Permintaan withdraw sedang diproses.');
+    }
+    
+    public function updateWithdrawStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:processing,canceled,done',
+        ]);
+    
+        $withdraw = MsWithdraw::findOrFail($id);
+        $withdraw->update(['status' => $request->status]);
+    
+        return back()->with('success', 'Status withdraw berhasil diperbarui.');
+    }
+    
+
+    public function processWithdrawPelajar(Request $request)
+    {
+        return $this->processWithdraw($request, 'pelajar');
+    }
+    
+    public function processWithdrawTutor(Request $request)
+    {
+        return $this->processWithdraw($request, 'tutor');
+    }
+    
+    private function processWithdraw(Request $request, $role)
+    {
+        $userId = session('id');
+    
+        // Validasi input
+        $request->validate([
+            'amount' => 'required|numeric|min:10000', // Minimal withdraw Rp 10.000
+            'account_number' => 'required|string',
+            'bank' => 'required|string',
+            'account_name' => 'required|string',
+        ]);
+    
+        // Ambil saldo pengguna
+        $wallet = Wallet::where('user_id', $userId)->first();
+    
+        if (!$wallet || $wallet->balance < $request->amount) {
+            return response()->json(['success' => false, 'message' => 'Saldo tidak cukup'], 400);
+        }
+    
+        // Simpan permintaan withdraw ke database
+        MsWithdraw::create([
+            'user_id' => $userId,
+            'amount' => $request->amount,
+            'bank_name' => $request->bank,
+            'account_number' => $request->account_number,
+            'account_name' => $request->account_name,
+            'status' => 'processing', // Status default processing
+            'role' => $role // Menyimpan apakah ini withdraw pelajar atau tutor
+        ]);
+    
+        // Kurangi saldo di wallet
+        $wallet->balance -= $request->amount;
+        $wallet->save();
+    
+        return response()->json(['success' => true, 'message' => 'Permintaan withdraw sedang diproses']);
+    }
+    
 
     public function deposit(Request $request)
     {

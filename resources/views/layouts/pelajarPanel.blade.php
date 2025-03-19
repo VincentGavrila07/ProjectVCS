@@ -11,12 +11,19 @@
 </head>
 <style>
     #sidebar {
-        height: 100vh; /* Tinggi sidebar sesuai viewport */
-        width: 16rem; /* Lebar sidebar */
-        background-color: #1f2937; /* Warna latar sidebar */
-        position: fixed; /* Sidebar tetap di tempatnya */
+        height: 100vh; /* Sidebar setinggi viewport */
+        width: 16rem; /* Lebar tetap */
+        background-color: #1f2937; /* Warna sidebar */
+        position: fixed; /* Tetap di tempat */
         top: 0;
         left: 0;
+        overflow-y: auto; /* Scrollable jika konten melebihi */
+        scrollbar-width: none; /* Hilangkan scrollbar di Firefox */
+    }
+
+    /* Hilangkan scrollbar di Chrome, Edge, Safari */
+    #sidebar::-webkit-scrollbar {
+        display: none;
     }
 </style>
 <body class="bg-gray-100">
@@ -26,27 +33,32 @@
        <!-- Sidebar -->
         <!-- Sidebar -->
         <div id="sidebar" class="w-64 bg-gray-800 text-white p-6 fixed inset-y-0 left-0 transform -translate-x-full transition-transform duration-300 ease-in-out md:translate-x-0 md:sticky md:top-0 md:h-screen">
-            <!-- Profile Section -->
+            <!-- Logo Section -->
             <div class="flex justify-center mb-6">
                 <img src="{{ asset('images/LogoVcs.png') }}" 
                     alt="Logo Picture" 
-                    class="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 transition-all duration-300">
+                    class="w-16 h-16 md:w-24 md:h-24 lg:w-32 lg:h-32 transition-all duration-300">
             </div>
 
             <!-- Profile Section -->
-            <div class="flex items-center mb-6">
-                <div class="w-16 h-16 rounded-full bg-gray-500 flex items-center justify-center mr-4">
+            <div class="flex flex-col items-center mb-6">
+                <div class="w-24 h-24 rounded-full bg-gray-500 flex items-center justify-center mb-4">
                     @if(session('image'))
-                        <img src="{{ asset('storage/' . session('image')) }}" alt="Profile Picture" class="w-16 h-16 rounded-full border-2 border-blue-400 shadow-md">
+                        <img src="{{ asset('storage/' . session('image')) }}" 
+                            alt="Profile Picture" 
+                            class="w-24 h-24 rounded-full border-4 border-blue-400 shadow-md object-cover">
                     @else
-                        <img src="{{ asset('images/user.jpg') }}" alt="Profile Picture" class="w-16 h-16 rounded-full border-2 border-gray-300 shadow-md">
+                        <img src="{{ asset('images/user.jpg') }}" 
+                            alt="Profile Picture" 
+                            class="w-24 h-24 rounded-full border-4 border-gray-300 shadow-md object-cover">
                     @endif
                 </div>
-                <div class="text-sm">
-                    <p class="font-semibold">{{ session('username') }}</p>
-                    <p class="text-gray-400">{{ session('email') }}</p>
+                <div class="text-center">
+                    <p class="font-semibold text-lg">{{ session('username') }}</p>
+                    <p class="text-gray-400 text-sm">{{ session('email') }}</p>
                 </div>
             </div>
+
 
             <!-- Menu -->
             <ul>
@@ -72,9 +84,20 @@
                     </a>
                 </li>
                 <li>
+                    <a href="{{ route('pelajar.transaksiList') }}" class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded {{ Route::is('pelajar.transaksiList') ? 'bg-yellow-500' : '' }}">
+                        History 
+                    </a>
+                </li>
+                <li>
                     <a href="{{ route('wallet.index') }}" class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded 
                         {{ Route::is('wallet.index') ? 'bg-yellow-500' : '' }}">
-                        Wallet
+                        Deposit
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('pelajar.wallet') }}" class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded 
+                        {{ Route::is('pelajar.wallet') ? 'bg-yellow-500' : '' }}">
+                        Withdraw
                     </a>
                 </li>
                 <li>

@@ -48,16 +48,15 @@
                                     {{ optional($room->lastMessage)->created_at ? optional($room->lastMessage)->created_at->diffForHumans() : '' }}
                                 </span>
 
-                                <!-- Notifikasi Pesan Baru -->
-                                @if($room->newMessagesCount > 0)
-                                    <span class="absolute top-2 right-2 bg-red-500 text-white text-sm font-bold px-2 py-1 rounded-full">
-                                        {{ $room->newMessagesCount }}
-                                    </span>
-                                @endif
-                            </a>
-                        </li>
-                    @endforeach
-                @endif
+                            <!-- Notifikasi pesan baru -->
+                            @if($room->newMessagesCount > 0)
+                                <span class="absolute top-2 right-2 bg-red-500 text-white text-sm font-bold px-2 py-1 rounded-full">
+                                    {{ $room->newMessagesCount }}
+                                </span>
+                            @endif
+                        </a>
+                    </li>
+                @endforeach
             </ul>
         </div>
 

@@ -16,6 +16,60 @@ use GuzzleHttp\Client;
 
 class TutorController extends Controller
 {
+
+    public function toggleAvailability(Request $request)
+    {
+        // Ambil ID tutor dari session
+        $tutorId = session('id');
+
+        if (!$tutorId) {
+            return response()->json(['success' => false, 'message' => 'User not found'], 403);
+        }
+
+        // Temukan user berdasarkan session
+        $tutor = MsUser::find($tutorId);
+
+        if (!$tutor) {
+            return response()->json(['success' => false, 'message' => 'Tutor not found'], 404);
+        }
+
+        // Toggle status isAvailable
+        $tutor->isAvailable = !$tutor->isAvailable;
+        $tutor->save();
+
+        return response()->json([
+            'success' => true,
+            'isAvailable' => $tutor->isAvailable
+        ]);
+    }
+
+    public function setAFK(Request $request)
+    {
+        // Ambil ID tutor dari session
+        $tutorId = session('id');
+
+        if (!$tutorId) {
+            return response()->json(['success' => false, 'message' => 'User not found'], 403);
+        }
+
+        // Temukan tutor berdasarkan session
+        $tutor = MsUser::find($tutorId);
+
+        if (!$tutor) {
+            return response()->json(['success' => false, 'message' => 'Tutor not found'], 404);
+        }
+
+        // Set status isAvailable ke false
+        $tutor->isAvailable = false;
+        $tutor->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tutor is now AFK'
+        ]);
+    }
+
+
     public function sewaTutor(Request $request)
 {
     $studentId = session('id'); // Ambil ID pelajar dari session
@@ -99,10 +153,15 @@ public function confirmRequest(Request $request)
 
         // Cari wallet pelajar
         $studentWallet = Wallet::where('user_id', $transaction->student_id)->first();
+        $tutorWallet = Wallet::where('user_id', $transaction->tutor_id)->first();
 
         if (!$studentWallet) {
             Log::error('Wallet pelajar tidak ditemukan:', ['student_id' => $transaction->student_id]);
             return response()->json(['success' => false, 'message' => 'Wallet pelajar tidak ditemukan.']);
+        }
+        if (!$tutorWallet) {
+            Log::error('Wallet pelajar tidak ditemukan:', ['tutor_id' => $transaction->student_id]);
+            return response()->json(['success' => false, 'message' => 'Wallet tutor tidak ditemukan.']);
         }
 
         // Pastikan saldo pelajar mencukupi
@@ -122,7 +181,8 @@ public function confirmRequest(Request $request)
             ]);
             return response()->json(['success' => false, 'message' => 'Data pelajar atau tutor tidak ditemukan.']);
         }
-
+        $tutor->isAvailable = !$tutor->isAvailable;
+        $tutor->save();
         // Buat meeting Zoom
         $client = new Client();
         $clientId = env('ZOOM_CLIENT_ID');
@@ -192,8 +252,12 @@ public function confirmRequest(Request $request)
         ]);
 
         // Kurangi saldo pelajar
-        $studentWallet->withdraw($transaction->amount);
+        $studentWallet->balance -= $transaction->amount;
+        $studentWallet->save();
 
+        // Tambahkan saldo tutor
+        $tutorWallet->balance += $transaction->amount;
+        $tutorWallet->save();
         DB::commit();
 
         Log::info('Transaksi berhasil dikonfirmasi:', ['transaction_id' => $transactionId]);

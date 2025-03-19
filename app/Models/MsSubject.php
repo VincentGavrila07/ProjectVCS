@@ -18,4 +18,5 @@ class MsSubject extends Model
     {
         return $this->hasMany(MsUser::class, 'subjectClass', 'id');
     }
+    
 }

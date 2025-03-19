@@ -11,7 +11,7 @@ class MsUser extends Model
     use HasFactory;
 
     protected $table = 'msuser'; 
-    protected $fillable = ['username', 'password', 'email', 'role','TeacherId','subjectClass']; 
+    protected $fillable = ['username', 'password', 'email', 'role','TeacherId','subjectClass','isAvailable']; 
 
     protected $primaryKey = 'id'; 
 
@@ -20,6 +20,10 @@ class MsUser extends Model
     const UPDATED_AT = 'updated_at';
 
     public $timestamps = true; 
+    protected $casts = [
+        'isAvailable' => 'boolean',
+    ];
+        
 
     // MsUser Model
     public function subjectClass()

@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use App\Models\Transaction;
 use App\Models\MsUser;
@@ -117,4 +117,63 @@ class VideoCallController extends Controller
             abort(500, 'Gagal membuat meeting: ' . ($errorBody['message'] ?? 'Unknown error'));
         }
     }
+
+    private function fetchRecordingUrl($meetingId, $attempts = 5, $delay = 60)
+    {
+        $clientId = env('ZOOM_CLIENT_ID');
+        $clientSecret = env('ZOOM_CLIENT_SECRET');
+        $accountId = env('ZOOM_ACCOUNT_ID');
+
+        $client = new Client();
+
+        try {
+            // Dapatkan access token
+            $tokenResponse = $client->post('https://zoom.us/oauth/token', [
+                'headers' => [
+                    'Authorization' => 'Basic ' . base64_encode("$clientId:$clientSecret"),
+                ],
+                'form_params' => [
+                    'grant_type' => 'account_credentials',
+                    'account_id' => $accountId,
+                ],
+            ]);
+
+            $tokenData = json_decode($tokenResponse->getBody(), true);
+            $accessToken = $tokenData['access_token'];
+
+            for ($i = 0; $i < $attempts; $i++) {
+                // Ambil data rekaman
+                $response = $client->get("https://api.zoom.us/v2/meetings/$meetingId/recordings", [
+                    'headers' => [
+                        'Authorization' => "Bearer $accessToken",
+                        'Content-Type' => 'application/json',
+                    ],
+                ]);
+
+                $recordingData = json_decode($response->getBody(), true);
+
+                // Ambil URL rekaman pertama (jika ada)
+                if (!empty($recordingData['recording_files'])) {
+                    $recordingUrl = $recordingData['recording_files'][0]['play_url'];
+
+                    // Simpan ke database
+                    RoomZoomCall::where('zoom_meeting_id', $meetingId)->update([
+                        'recording_url' => $recordingUrl,
+                    ]);
+
+                    return $recordingUrl;
+                }
+
+                // Tunggu sebelum mencoba lagi
+                sleep($delay);
+            }
+
+            return null;
+        } catch (\Exception $e) {
+            Log::error("Gagal mengambil recording URL: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    
 }

@@ -6,7 +6,7 @@
     <!-- Panel Pencarian -->
     <form method="GET" action="{{ route('userList') }}" class="mb-4">
         <div class="flex items-center">
-            <input type="text" name="search" value="{{ request()->input('search') }}" placeholder="Cari berdasarkan nama, role, atau email" class="border px-4 py-2 rounded-lg mr-2 w-96">
+            <input type="text" name="search" value="{{ request()->input('search') }}" placeholder="Cari berdasarkan id, nama, role, atau email" class="border px-4 py-2 rounded-lg mr-2 w-96">
             <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">
                 <i class="fas fa-search"></i> <!-- Ikon search -->
             </button>
@@ -49,7 +49,7 @@
                     <tr>
                         <td class="border border-gray-300 px-4 py-2">{{ $user->id }}</td>
                         <td class="border border-gray-300 px-4 py-2">{{ $user->username }}</td>
-                        <td class="border border-gray-300 px-4 py-2">{{ $user->role }}</td>
+                        <td class="border border-gray-300 px-4 py-2">{{ $user->role_name ?? 'Tidak ada role' }}</td>
                         <td class="border border-gray-300 px-4 py-2">{{ $user->email }}</td>
                     </tr>
                 @endforeach
