@@ -14,13 +14,12 @@
         <p class="text-sm text-gray-500 mt-1 font-bold">{{ $tutor->subject_name ?? '-' }}</p>
 
         <div class="flex justify-center items-center mt-2 text-gray-500 text-sm">
-            @if (\Carbon\Carbon::parse($tutor->created_at)->diffInDays(now()) == 0)
-                <span class="font-bold">Baru saja bergabung</span>
-            @else
-                <span class="font-bold">Sejak {{ \Carbon\Carbon::parse($tutor->created_at)->diffInDays(now()) }} hari yang lalu</span>
-            @endif
+            <span class="font-bold">
+                Bergabung {{ $tutor->experience }}
+            </span>
             <span class="ml-3">👍 97%</span>
         </div>
+
 
         <p class="text-sm text-gray-700 font-medium mt-2">
             {{ $tutor->price ? 'Rp ' . number_format($tutor->price, 0, ',', '.') . '/jam' : 'Gratis' }}
