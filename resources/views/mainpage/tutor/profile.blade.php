@@ -1,37 +1,37 @@
 @extends('layouts.tutorPanel')
 
 @section('content')
-    <h2 class="text-2xl font-semibold mb-4">Edit Profile</h2>
 
-    @if(session('success'))
-        <div class="bg-green-500 text-white p-4 rounded mb-4">
-            {{ session('success') }}
-        </div>
-    @endif
+@if(session('success'))
+<div class="bg-green-500 text-white p-4 rounded mb-4">
+    {{ session('success') }}
+</div>
+@endif
 
-    @php
-        $isIncomplete = empty(session('username')) || empty(session('price')) || empty(session('subjectClass')) || empty(session('image'));
-    @endphp
+@php
+$isIncomplete = empty(session('username')) || empty(session('price')) || empty(session('subjectClass')) || empty(session('image'));
+@endphp
 
-    @if($isIncomplete)
-        <div class="bg-red-500 text-white p-4 rounded mb-4">
-            <p><strong>⚠️ Perhatian!</strong> Harap lengkapi semua data secepatnya.</p>
-        </div>
-    @endif
+@if($isIncomplete)
+<div class="bg-red-500 text-white p-4 rounded mb-4">
+    <p><strong>⚠️ Perhatian!</strong> Harap lengkapi semua data secepatnya.</p>
+</div>
+@endif
 
-    <form action="{{ route('profile.update.tutor') }}" method="POST" enctype="multipart/form-data" class="max-w-lg mx-auto bg-white p-6 rounded shadow">
-        @csrf
-        @method('PUT')
-
-        <div class="mb-4">
-            <label for="username" class="block font-medium mb-1">Username</label>
-            <input type="text" name="username" id="username" value="{{ old('username', session('username')) }}" class="w-full border px-3 py-2 rounded" required>
-            @error('username')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
-        </div>
-
-        <div class="mb-4">
+<form action="{{ route('profile.update.tutor') }}" method="POST" enctype="multipart/form-data" class="max-w-lg mx-auto bg-white p-6 rounded shadow">
+    @csrf
+    @method('PUT')
+    
+    <div class="mb-4">
+        <h2 class="text-2xl font-semibold mb-4">Edit Profile</h2>
+        <label for="username" class="block font-medium mb-1">Username</label>
+        <input type="text" name="username" id="username" value="{{ old('username', session('username')) }}" class="w-full border px-3 py-2 rounded" required>
+        @error('username')
+        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+        @enderror
+    </div>
+    
+    <div class="mb-4">
             <label for="price" class="block font-medium mb-1">Harga</label>
             <input type="number" name="price" id="price" value="{{ old('price', session('price')) }}" class="w-full border px-3 py-2 rounded" required>
             @error('price')
@@ -64,7 +64,7 @@
             @if(session('image'))
                 <div class="mt-2">
                     <p class="font-medium">Foto Saat Ini:</p>
-                    <img src="{{ asset('storage/' . session('image')) }}" alt="Foto Profil" class="w-24 h-24 rounded-full">
+                    <img src="{{ asset('storage/' . session('image')) }}" alt="Foto Profil" class="w-24 h-24 rounded-full border-4 border-blue-400 shadow-md object-cover">
                 </div>
             @endif
         </div>
