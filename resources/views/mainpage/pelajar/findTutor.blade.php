@@ -217,8 +217,8 @@ function sewaTutor(tutorId) {
                             // Jika waktu habis, tampilkan pesan
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Waktu Habis',
-                                text: 'Tutor tidak merespons dalam waktu yang ditentukan.',
+                                title: 'Transaksi Gagal',
+                                text: 'Tutor menolak atau tidak merespons dalam waktu yang ditentukan.',
                                 showConfirmButton: true,
                             });
                         }

@@ -20,6 +20,7 @@
                 <th class="border border-gray-700 px-4 py-2 text-left">ID</th>
                 <th class="border border-gray-700 px-4 py-2 text-left">Nama</th>
                 <th class="border border-gray-700 px-4 py-2 text-left">Bank</th>
+                <th class="border border-gray-700 px-4 py-2 text-left">Rekening</th>
                 <th class="border border-gray-700 px-4 py-2 text-left">Email</th>
                 <th class="border border-gray-700 px-4 py-2 text-left">Jumlah</th>
                 <th class="border border-gray-700 px-4 py-2 text-left">Status</th>
@@ -33,6 +34,7 @@
                     <td class="border border-gray-300 px-4 py-2">{{ $withdraw->id }}</td>
                     <td class="border border-gray-300 px-4 py-2">{{ $withdraw->username }}</td>
                     <td class="border border-gray-300 px-4 py-2">{{ $withdraw->bank_name }}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{ $withdraw->account_number }}</td>
                     <td class="border border-gray-300 px-4 py-2">{{ $withdraw->email }}</td>
                     <td class="border border-gray-300 px-4 py-2">Rp {{ number_format($withdraw->amount, 0, ',', '.') }}</td>
                     <td class="border border-gray-300 px-4 py-2 text-center">

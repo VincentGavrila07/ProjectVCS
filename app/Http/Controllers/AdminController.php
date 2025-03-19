@@ -270,6 +270,7 @@ class AdminController extends Controller
                 'MsWithdraw.id',
                 'MsUser.username',
                 'MsWithdraw.bank_name',
+                'MsWithdraw.account_number',
                 'MsUser.email',
                 'MsWithdraw.amount',
                 'MsWithdraw.status',
