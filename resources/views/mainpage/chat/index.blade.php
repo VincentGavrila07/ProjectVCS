@@ -13,6 +13,9 @@
         <!-- Buat daftar chat bisa di-scroll -->
         <div class="flex-1 overflow-y-auto max-h-[60vh] pr-2">
             <ul id="chatList">
+            @if($chatRooms->isEmpty())
+                <p class="text-center text-gray-500 font-semibold p-4">Belum Ada Chat</p>
+            @else
                 @foreach($chatRooms as $room)
                     <li class="chat-item relative">
                         <a href="{{ route('chat.room', $room->id) }}" 
@@ -41,6 +44,8 @@
                         </a>
                     </li>
                 @endforeach
+            @endif
+
             </ul>
         </div>
 
