@@ -20,4 +20,10 @@ class Transaction extends Model
         return $this->belongsTo(MsSubject::class, 'subject_id');
     }
 
+    public function roomZoomCall()
+    {
+        return $this->hasOne(RoomZoomCall::class, 'transaction_id', 'id');
+    }
+
+
 }

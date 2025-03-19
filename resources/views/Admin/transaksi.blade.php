@@ -22,6 +22,7 @@
                 <th class="border border-gray-300 px-4 py-2">Tutor ID</th>
                 <th class="border border-gray-300 px-4 py-2">Amount</th>
                 <th class="border border-gray-300 px-4 py-2">Status</th>
+                <th class="border border-gray-300 px-4 py-2">Status VCS</th>
                 <th class="border border-gray-300 px-4 py-2">Dibuat</th>
                 <th class="border border-gray-300 px-4 py-2">Actions</th>
             </tr>
@@ -34,6 +35,18 @@
                     <td class="border border-gray-300 px-4 py-2">{{ $transaction->tutor_id }}</td>
                     <td class="border border-gray-300 px-4 py-2">{{ number_format($transaction->amount, 2) }}</td>
                     <td class="border border-gray-300 px-4 py-2">{{ ucfirst($transaction->status) }}</td>
+                    <td class="border border-gray-300 px-4 py-2">
+                        @php
+                            $createdTime = strtotime($transaction->created_at);
+                            $currentTime = time();
+                            if ($transaction->status === 'canceled') {
+                                $statusVCS = 'Canceled';
+                            } else {
+                                $statusVCS = ($currentTime - $createdTime) <= (65 * 60) ? 'On Going' : 'Done';
+                            }
+                        @endphp
+                        {{ $statusVCS }}
+                    </td>
                     <td class="border border-gray-300 px-4 py-2">{{ $transaction->created_at->format('Y-m-d H:i') }}</td>
                     <td class="border border-gray-300 px-4 py-2 text-center">
                         <button onclick="confirmDelete('{{ $transaction->id }}')" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">

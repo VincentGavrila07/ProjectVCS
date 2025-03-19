@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\MsUser;
-use App\Models\Transaction;
+
 use App\Models\MsSubject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -170,39 +170,7 @@ class AdminController extends Controller
         }
     }
 
-    public function transaksiList(Request $request)
-    {
-        $query = Transaction::query();
-
-        // Cek apakah ada pencarian berdasarkan student_id atau tutor_id
-        if ($request->has('search')) {
-            $search = $request->input('search');
-            $query->where('id', 'LIKE', "%{$search}%")
-                ->orwhere('student_id', 'LIKE', "%{$search}%")
-                ->orWhere('tutor_id', 'LIKE', "%{$search}%");
-        }
-
-        $transactions = $query->orderBy('created_at', 'desc')->paginate(10);
-
-        return view('admin.transaksi', compact('transactions'));
-    }
-
-    public function destroyTransaction($id)
-    {
-        $transaction = Transaction::find($id);
-        
-        if (!$transaction) {
-            return response()->json(['success' => false, 'message' => 'Transaksi tidak ditemukan.'], 404);
-        }
-
-        // Hapus semua data terkait di roomzoomcall sebelum menghapus transaksi
-        DB::table('roomzoomcall')->where('transaction_id', $id)->delete();
-
-        // Hapus transaksi setelah data terkait dihapus
-        $transaction->delete();
-
-        return response()->json(['success' => true, 'message' => 'Transaksi berhasil dihapus.']);
-    }
+    
 
 
     public function subjectList(Request $request)

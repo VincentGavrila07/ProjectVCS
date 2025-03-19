@@ -72,6 +72,11 @@
                     </a>
                 </li>
                 <li>
+                    <a href="{{ route('pelajar.transaksiList') }}" class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded {{ Route::is('pelajar.transaksiList') ? 'bg-yellow-500' : '' }}">
+                        History 
+                    </a>
+                </li>
+                <li>
                     <a href="{{ route('wallet.index') }}" class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded 
                         {{ Route::is('wallet.index') ? 'bg-yellow-500' : '' }}">
                         Deposit

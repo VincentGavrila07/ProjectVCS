@@ -84,6 +84,11 @@
                     </a>
                 </li>
                 <li>
+                    <a href="{{ route('tutor.transaksiList') }}" class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded {{ Route::is('tutor.transaksiList') ? 'bg-yellow-500' : '' }}">
+                        History 
+                    </a>
+                </li>
+                <li>
                     <a href="{{ route('tutor.wallet') }}" class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded 
                         {{ request()->routeIs('tutor.wallet') ? 'bg-yellow-500' : '' }}">
                         Withdraw

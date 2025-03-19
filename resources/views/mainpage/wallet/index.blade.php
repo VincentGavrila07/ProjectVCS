@@ -3,7 +3,7 @@
 @section('content')
 <div class="container mx-auto p-6">
     <div class="max-w-lg mx-auto bg-white rounded-lg shadow-lg p-6">
-        <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Wallet</h2>
+        <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Deposit</h2>
         
         <!-- Saldo Section -->
         <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white mb-6">

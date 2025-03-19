@@ -38,7 +38,7 @@
                         <td class="border border-gray-300 px-4 py-2">{{ $withdraw->id }}</td>
                         <td class="border border-gray-300 px-4 py-2">{{ $withdraw->bank_name }}</td>
                         <td class="border border-gray-300 px-4 py-2">{{ $withdraw->account_number }}</td>
-                        <td class="border border-gray-300 px-4 py-2">Rp {{ number_format($withdraw->amount, 0, ',', '.') }}</td>
+                        <td class="border border-gray-300 px-4 py-2">{{ number_format($withdraw->amount, 0, ',', '.') }}</td>
                         <td class="border border-gray-300 px-4 py-2 text-center">
                             <span class="px-3 py-1 rounded-lg 
                                 @if($withdraw->status == 'processing') bg-yellow-500 text-white 

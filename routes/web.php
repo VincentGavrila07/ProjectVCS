@@ -9,6 +9,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\DbConnectController;
 use App\Http\Controllers\FindTutorController;
+use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\VideoCallController;
 use App\Http\Middleware\CheckSession;
@@ -40,8 +41,8 @@ Route::middleware(['check.session'])->group(function () {
     Route::delete('/admin/tutor/{id}', [AdminController::class, 'deleteTutor'])->name('deleteTutor');
     Route::get('/admin/pelajarList', [AdminController::class, 'pelajarList'])->name('pelajarList');
     Route::delete('/admin/pelajar/{id}', [AdminController::class, 'deletePelajar'])->name('deletePelajar');
-    Route::get('/admin/transaksiList', [AdminController::class, 'transaksiList'])->name('transaksiList');
-    Route::delete('/admin/transactions/{id}', [AdminController::class, 'destroyTransaction'])->name('transactions.destroy');
+    Route::get('/admin/transaksiList', [TransaksiController::class, 'transaksiList'])->name('transaksiList');
+    Route::delete('/admin/transactions/{id}', [TransaksiController::class, 'destroyTransaction'])->name('transactions.destroy');
     Route::get('/admin/subjectList', [AdminController::class, 'subjectList'])->name('subjectList');
     Route::post('/subject/store', [AdminController::class, 'store'])->name('subject.store');
     Route::put('/subject/update/{id}', [AdminController::class, 'update'])->name('subject.update');
@@ -98,6 +99,10 @@ Route::middleware(['check.session'])->group(function () {
     
     // ------------------------------------------- Video Call Routes -------------------------------------------
     Route::get('/video-call/{transaction_id}', [VideoCallController::class, 'index'])->name('video.call');
+    // ------------------------------------------- Transaction Routes -------------------------------------------
+    Route::get('/pelajar/transaksiList', [TransaksiController::class, 'historyTransaksi'])->name('pelajar.transaksiList');
+    Route::get('/tutor/transaksiList', [TransaksiController::class, 'historyTransaksi'])->name('tutor.transaksiList');
+
 });
 Route::match(['get', 'post'], '/wallet/handle-notification', [WalletController::class, 'handleNotification'])->name('wallet.handle.notification');
 
