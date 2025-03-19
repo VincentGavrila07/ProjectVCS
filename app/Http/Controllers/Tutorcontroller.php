@@ -153,10 +153,15 @@ public function confirmRequest(Request $request)
 
         // Cari wallet pelajar
         $studentWallet = Wallet::where('user_id', $transaction->student_id)->first();
+        $tutorWallet = Wallet::where('user_id', $transaction->tutor_id)->first();
 
         if (!$studentWallet) {
             Log::error('Wallet pelajar tidak ditemukan:', ['student_id' => $transaction->student_id]);
             return response()->json(['success' => false, 'message' => 'Wallet pelajar tidak ditemukan.']);
+        }
+        if (!$tutorWallet) {
+            Log::error('Wallet pelajar tidak ditemukan:', ['tutor_id' => $transaction->student_id]);
+            return response()->json(['success' => false, 'message' => 'Wallet tutor tidak ditemukan.']);
         }
 
         // Pastikan saldo pelajar mencukupi
@@ -247,8 +252,12 @@ public function confirmRequest(Request $request)
         ]);
 
         // Kurangi saldo pelajar
-        $studentWallet->withdraw($transaction->amount);
+        $studentWallet->balance -= $transaction->amount;
+        $studentWallet->save();
 
+        // Tambahkan saldo tutor
+        $tutorWallet->balance += $transaction->amount;
+        $tutorWallet->save();
         DB::commit();
 
         Log::info('Transaksi berhasil dikonfirmasi:', ['transaction_id' => $transactionId]);
