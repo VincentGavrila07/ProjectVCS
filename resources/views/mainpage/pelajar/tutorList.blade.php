@@ -6,7 +6,7 @@
 
         <img src="{{ $tutorImage }}" 
             alt="Tutor Image" 
-            class="w-24 h-24 object-cover rounded-full border-2 border-blue-500 shadow-md">
+            class="w-24 h-24 object-cover rounded-full border-4 border-blue-400 shadow-md">
 
         <h3 class="text-lg font-semibold mt-3">{{ $tutor->username }}</h3>
         <span class="text-sm text-blue-500 font-medium">Tutor ID: {{ $tutor->TeacherId }}</span>
