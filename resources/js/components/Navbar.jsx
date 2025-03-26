@@ -118,7 +118,7 @@ const Navbar = () => {
                     className="block text-center bg-blue-600 text-white px-5 py-3 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300"
                     onClick={() => setIsOpen(false)}
                 >
-                    Get Started
+                    Masuk / Daftar
                 </a>
                 </li>
             </ul>
