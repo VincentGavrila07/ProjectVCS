@@ -1,18 +1,21 @@
 <?php
 
+use App\Models\MsUser;
+use App\Http\Middleware\CheckSession;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\TutorController;
+use App\Http\Controllers\WalletController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\DbConnectController;
 use App\Http\Controllers\FindTutorController;
 use App\Http\Controllers\TransaksiController;
-use App\Http\Controllers\WalletController;
 use App\Http\Controllers\VideoCallController;
-use App\Http\Middleware\CheckSession;
+use App\Http\Controllers\Forum\PostController;
+use App\Http\Controllers\Forum\ThreadController;
 
 /*
 |--------------------------------------------------------------------------
@@ -103,6 +106,15 @@ Route::middleware(['check.session'])->group(function () {
     Route::get('/pelajar/transaksiList', [TransaksiController::class, 'historyTransaksi'])->name('pelajar.transaksiList');
     Route::get('/tutor/transaksiList', [TransaksiController::class, 'historyTransaksi'])->name('tutor.transaksiList');
 
+    Route::prefix('forum')->name('forum.')->group(function () {
+        Route::get('/threads', [ThreadController::class, 'index'])->name('threads.index');
+        Route::get('/threads/create', [ThreadController::class, 'create'])->name('threads.create');
+        Route::post('/threads', [ThreadController::class, 'store'])->name('threads.store');
+        Route::get('/threads/{id}', [ThreadController::class, 'show'])->name('threads.show');
+    
+        Route::post('/threads/posts', [PostController::class, 'store'])->name('posts.store');
+    });
+    
 });
 Route::match(['get', 'post'], '/wallet/handle-notification', [WalletController::class, 'handleNotification'])->name('wallet.handle.notification');
 

@@ -46,8 +46,8 @@ const Navbar = () => {
             { name: "Home", to: "home" },
             { name: "About Us", to: "about" },
             { name: "Tutors", to: "tutor" },
-            { name: "Contact Us", to: "contact" },
-            { name: "Forum", to: "forum" }
+            { name: "Forum", to: "forum" },
+            { name: "Contact Us", to: "footer" }
           ].map((item, index) => (
             <motion.li
               key={index}

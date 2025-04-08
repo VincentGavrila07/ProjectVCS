@@ -18,5 +18,9 @@ class MsSubject extends Model
     {
         return $this->hasMany(MsUser::class, 'subjectClass', 'id');
     }
+
+    public function thread(){
+        return $this->hasMany(Thread::class, 'subjectId', 'id');
+    }
     
 }

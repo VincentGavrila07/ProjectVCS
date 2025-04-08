@@ -73,6 +73,13 @@
                     </a>
                 </li>
                 <li>
+                    <a href="{{ route('forum.threads.index') }}"
+                    class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded 
+                            {{ Route::is('forum.*') ? 'bg-yellow-500 text-white' : '' }}">
+                        Thread
+                    </a>
+                </li>
+                <li>
                     <a href="{{ route('findTutor') }}" class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded {{ Route::is('findTutor') ? 'bg-yellow-500' : '' }}">
                         Cari Tutor
                     </a>
