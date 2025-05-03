@@ -25,7 +25,7 @@
             {{ $tutor->price ? 'Rp ' . number_format($tutor->price, 0, ',', '.') . '/jam' : 'Gratis' }}
         </p>
 
-        <a href="{{ route('chat.create', ['tutor_id' => $tutor->id]) }}" 
+        <a href="{{ route('chatting.create', ['tutor_id' => $tutor->id]) }}" 
             class="mt-3 px-4 py-2 bg-blue-500 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-blue-600 transition duration-200 cursor-pointer">
             💬 Chat Sekarang
         </a>

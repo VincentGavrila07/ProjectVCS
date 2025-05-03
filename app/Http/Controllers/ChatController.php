@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\MsChatRoom;
 use App\Models\TrMessages;
+use App\Events\MessageSent;
 use Carbon\Carbon;
 
 
@@ -92,42 +93,52 @@ class ChatController extends Controller
     
     // Mengirim pesan
     public function sendMessage(Request $request, $room_id)
-    {
-        $user_id = session('id');
-        $chatRoom = MsChatRoom::findOrFail($room_id);
-    
-        if ($user_id != $chatRoom->student_id && $user_id != $chatRoom->tutor_id) {
-            abort(403, 'Unauthorized');
-        }
-    
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('chat_images', 'public');
-        }
-    
-        $filePath = null;
-        if ($request->hasFile('attachment')) { // Menggunakan key yang benar
-            $filePath = $request->file('attachment')->store('chat_files', 'public');
-        }
-    
-        if (!$request->filled('message') && !$imagePath && !$filePath) {
-            return redirect()->back()->with('error', 'Pesan tidak boleh kosong!');
-        }
-    
-        TrMessages::create([
-            'room_id' => $room_id,
-            'sender_id' => $user_id,
-            'message' => $request->message ?? '',
-            'image' => $imagePath,
-            'file' => $filePath // Menyimpan path file attachment
-        ]);
-    
-        $chatRoom->update(['last_activity' => now()]);
-    
-        return redirect()->back();
+{
+    $user_id = session('id');
+    $chatRoom = MsChatRoom::findOrFail($room_id);
+
+    if ($user_id != $chatRoom->student_id && $user_id != $chatRoom->tutor_id) {
+        abort(403, 'Unauthorized');
     }
+
+    $imagePath = null;
+    if ($request->hasFile('image')) {
+        $imagePath = $request->file('image')->store('chat_images', 'public');
+    }
+
+    $filePath = null;
+    if ($request->hasFile('attachment')) { // Menggunakan key yang benar
+        $filePath = $request->file('attachment')->store('chat_files', 'public');
+    }
+
+    if (!$request->filled('message') && !$imagePath && !$filePath) {
+        return redirect()->back()->with('error', 'Pesan tidak boleh kosong!');
+    }
+
+    // Membuat pesan baru
+    $message = TrMessages::create([
+        'room_id' => $room_id,
+        'sender_id' => $user_id,
+        'message' => $request->message ?? '',
+        'image' => $imagePath,
+        'file' => $filePath
+    ]);
+
+    $message->save();
+    $message->refresh(); // pastikan created_at dan relasi 'sender' terisi
+    $this->sendMessageToPusher($message);
+
+
+    $chatRoom->update(['last_activity' => now()]);
+
+    // Mendispatch event setelah pesan terkirim
+    event(new MessageSent($message->id));
+
+    return redirect()->back();
+}
+
     
-    
+
     
     
 }

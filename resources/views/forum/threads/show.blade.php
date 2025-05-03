@@ -51,7 +51,7 @@
 
     {{-- Komentar --}}
     <div class="bg-white p-6 rounded-2xl shadow border border-gray-100 space-y-6">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4">💬 Komentar</h2>
+        <h2 class="text-lg font-semibold text-gray-800 mb-4"> Komentar</h2>
 
         @php
             $parentComments = $groupedPosts[null] ?? [];

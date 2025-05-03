@@ -95,11 +95,13 @@
                         Thread
                     </a>
                 </li>
-                <li>
-                    <a href="{{ route('chat.index') }}" class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded 
-                        {{ request()->routeIs('chat.index') || request()->routeIs('chat.room') ? 'bg-yellow-500' : '' }}">
-                        Chat
+
+                <li class="relative">
+                    <a href="{{ route('chatting.index') }}" class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded
+                        {{ request()->routeIs('chatting.index') || request()->routeIs('chatting.room') ? 'bg-yellow-500' : '' }}">
+                        Chatting
                     </a>
+                    <span class="absolute top-2 right-3 w-3 h-3 bg-red-500 rounded-full animate-pulse" style="display: none;"></span>
                 </li>
                 <li>
                     <a href="{{ route('tutor.transaksiList') }}" class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded {{ Route::is('tutor.transaksiList') ? 'bg-yellow-500' : '' }}">
@@ -345,6 +347,39 @@ document.addEventListener("DOMContentLoaded", function () {
     // Mulai hitungan waktu AFK saat pertama kali masuk
     resetTimer();   
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    const checkUnreadMessages = () => {
+        fetch('/unread-messages-count')
+            .then(response => response.json())
+            .then(data => {
+                const unreadCount = data.unreadMessagesCount;
+                console.log('Unread messages:', unreadCount);
+
+                const chattingLink = document.querySelector('a[href="{{ route('chatting.index') }}"]');
+                const chattingLi = chattingLink?.parentElement;
+
+                if (!chattingLi) return;
+
+                const redDot = chattingLi.querySelector('span');
+
+                if (unreadCount > 0) {
+                    if (redDot) {
+                        redDot.style.display = 'block';
+                    }
+                } else {
+                    if (redDot) {
+                        redDot.style.display = 'none';
+                    }
+                }
+            })
+            .catch(err => console.error('Error checking unread messages:', err));
+    };
+
+    setInterval(checkUnreadMessages, 5000);
+    checkUnreadMessages();
+});
+
 
 </script>
 

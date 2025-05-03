@@ -9,6 +9,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\TutorController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ChattingController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\DbConnectController;
 use App\Http\Controllers\FindTutorController;
@@ -86,10 +87,16 @@ Route::middleware(['check.session'])->group(function () {
     Route::post('/check-transaction-status', [TutorController::class, 'checkTransactionStatus'])->name('check.transaction.status');
     
     // ------------------------------------------- Chat Routes -------------------------------------------
-    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
-    Route::get('/chat/{room_id}', [ChatController::class, 'showRoom'])->name('chat.room');
-    Route::post('/chat/{room_id}/send', [ChatController::class, 'sendMessage'])->name('chat.send');
-    Route::get('/chat/create/{tutor_id}', [ChatController::class, 'createRoom'])->name('chat.create');
+    // Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+    // Route::get('/chat/{room_id}', [ChatController::class, 'showRoom'])->name('chat.room');
+    // Route::post('/chat/{room_id}/send', [ChatController::class, 'sendMessage'])->name('chat.send');
+    
+    Route::get('/chat', [ChattingController::class, 'index'])->name('chatting.index'); // Menampilkan daftar room chat
+    Route::get('/chat/{room_id}', [ChattingController::class, 'showRoom'])->name('chatting.room'); // Menampilkan room chat tertentu
+    Route::post('/chat/{room_id}/send', [ChattingController::class, 'sendMessage'])->name('chatting.send'); // Mengirim pesan ke room chat
+    Route::get('/chat/create/{tutor_id}', [ChattingController::class, 'createRoom'])->name('chatting.create');
+    Route::get('/unread-messages-count', [ChattingController::class, 'getUnreadMessagesCount']);
+
     
     // ------------------------------------------- Wallet Routes -------------------------------------------
     Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
