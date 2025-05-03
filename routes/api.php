@@ -20,3 +20,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/landing/tutors', [LandingPageController::class, 'getTutors']);
+Route::get('/landing/threads', [LandingPageController::class, 'getThread']);

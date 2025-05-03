@@ -19,6 +19,7 @@
     },
     "dependencies": {
         "@zoomus/websdk": "^2.18.3",
+        "dayjs": "^1.11.13",
         "express": "^4.21.2",
         "framer-motion": "^12.5.0",
         "lucide-react": "^0.479.0",

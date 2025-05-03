@@ -41,4 +41,37 @@ class LandingPageController extends Controller
 
         return response()->json($tutors)->header('Access-Control-Allow-Origin', '*');
     }
+
+    public function getThread(Request $request){
+        $search = $request->input('search');
+    
+        $threads = DB::table('threads')
+            ->join('msuser', 'threads.user_id', '=', 'msuser.id')
+            ->leftJoin('mssubject as user_subjects', 'msuser.subjectClass', '=', 'user_subjects.id')
+            ->leftJoin('mssubject as thread_subjects', 'threads.subject_id', '=', 'thread_subjects.id')
+            ->select(
+                'threads.*',
+                'msuser.username',
+                'msuser.image',
+                'msuser.TeacherId as teacherid',
+                'msuser.role',
+                'user_subjects.subjectName as user_subject',
+                'thread_subjects.subjectName as thread_subject'
+            )
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('msuser.username', 'like', '%' . $search . '%')
+                      ->orWhere('msuser.TeacherId', 'like', '%' . $search . '%')
+                      ->orWhere('user_subjects.subjectName', 'like', '%' . $search . '%')
+                      ->orWhere('thread_subjects.subjectName', 'like', '%' . $search . '%')
+                      ->orWhere('threads.title', 'like', '%' . $search . '%');
+                });
+            })
+            ->orderByDesc('threads.created_at')
+            ->paginate(4); // PAGINATION aktif
+    
+        return response()->json($threads)->header('Access-Control-Allow-Origin', '*');
+    }
+    
+    
 }
