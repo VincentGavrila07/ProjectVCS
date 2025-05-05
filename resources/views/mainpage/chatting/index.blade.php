@@ -67,41 +67,67 @@
     @endif
 </div>
 
-{{-- Script Filter/Search --}}
+<script src="https://js.pusher.com/7.2/pusher.min.js"></script>
 <script>
-    const searchInput = document.getElementById('searchInput');
-    const chatRooms = document.querySelectorAll('.chat-room');
-    const filterButtons = document.querySelectorAll('.filter-btn');
-    let activeFilter = 'all';
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById('searchInput');
+        const chatRooms = document.querySelectorAll('.chat-room');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        let activeFilter = 'all';
 
-    function filterChats(mode) {
-        activeFilter = mode;
-        filterButtons.forEach(btn => btn.classList.remove('bg-blue-200'));
-        if (mode === 'unread') {
-            document.querySelector('[onclick="filterChats(\'unread\')"]').classList.add('bg-blue-200');
-        } else {
-            document.querySelector('[onclick="filterChats(\'all\')"]').classList.add('bg-blue-200');
-        }
-        applyFilters();
-    }
+        // Inisialisasi filter default (Semua)
+        document.querySelector('[onclick="filterChats(\'all\')"]').classList.add('bg-blue-200');
 
-    function applyFilters() {
-        const query = searchInput.value.toLowerCase();
-        chatRooms.forEach(room => {
-            const username = room.dataset.username;
-            const unread = room.dataset.unread === 'true';
-
-            const matchesSearch = username.includes(query);
-            const matchesFilter = activeFilter === 'all' || (activeFilter === 'unread' && unread);
-
-            if (matchesSearch && matchesFilter) {
-                room.style.display = 'flex';
+        // Fungsi untuk mengganti filter
+        window.filterChats = function(mode) {
+            activeFilter = mode;
+            filterButtons.forEach(btn => btn.classList.remove('bg-blue-200'));
+            if (mode === 'unread') {
+                document.querySelector('[onclick="filterChats(\'unread\')"]').classList.add('bg-blue-200');
             } else {
-                room.style.display = 'none';
+                document.querySelector('[onclick="filterChats(\'all\')"]').classList.add('bg-blue-200');
             }
-        });
-    }
+            applyFilters();
+        }
 
-    searchInput.addEventListener('input', applyFilters);
+        // Fungsi pencarian dan filter aktif
+        function applyFilters() {
+            const query = searchInput.value.toLowerCase();
+            chatRooms.forEach(room => {
+                const username = room.dataset.username;
+                const unread = room.dataset.unread === 'true';
+
+                const matchesSearch = username.includes(query);
+                const matchesFilter = activeFilter === 'all' || (activeFilter === 'unread' && unread);
+
+                room.style.display = (matchesSearch && matchesFilter) ? 'flex' : 'none';
+            });
+        }
+
+        // Trigger filter saat user mengetik
+        searchInput.addEventListener('input', applyFilters);
+
+        // --- Pusher Realtime Update ---
+        Pusher.logToConsole = false;
+
+        const pusher = new Pusher('{{ env('PUSHER_APP_KEY') }}', {
+            cluster: '{{ env('PUSHER_APP_CLUSTER') }}',
+            encrypted: true
+        });
+
+        const userId = {{ session('id') }};
+        const channel = pusher.subscribe('chatlist.' + userId);
+
+        channel.bind('room_updated', function(data) {
+            // Tambahkan animasi loading sebelum reload
+            document.body.insertAdjacentHTML('beforeend', `
+                <div id="overlay" class="fixed inset-0 bg-white bg-opacity-80 flex items-center justify-center z-50">
+                    <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500"></div>
+                </div>
+            `);
+            setTimeout(() => location.reload(), 500);
+        });
+    });
 </script>
+
 @endsection

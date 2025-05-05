@@ -7,45 +7,58 @@ use App\Models\MsChatRoom;
 use App\Models\TrMessages;
 use Pusher\Pusher;
 use Carbon\Carbon;
+use App\Events\MessageReceived;
 
 class ChattingController extends Controller
 {
     // Menampilkan daftar room chat user
+    // Menampilkan daftar room chat user dengan pengecekan notifikasi
     public function index(Request $request)
     {
         $user_id = session('id');
         $role = session('role');
-
+    
         // Menentukan query untuk chat rooms berdasarkan role user
         if ($role == 2) { // Jika Pelajar
             $chatRooms = MsChatRoom::where('student_id', $user_id)->get();
         } else { // Jika Tutor
             $chatRooms = MsChatRoom::where('tutor_id', $user_id)->get();
         }
-
+    
         // Menambahkan pesan terakhir dan menghitung pesan yang belum dibaca untuk setiap room
         foreach ($chatRooms as $room) {
             // Ambil pesan terakhir berdasarkan room_id
             $lastMessage = TrMessages::where('room_id', $room->id)
                 ->latest('created_at') // Mengurutkan pesan berdasarkan waktu terbaru
                 ->first();
-
+    
             $room->lastMessage = $lastMessage;
-
+    
             // Hitung jumlah pesan yang belum dibaca
             $room->newMessagesCount = TrMessages::where('room_id', $room->id)
                 ->where('sender_id', '!=', $user_id)
                 ->where('isRead', 0)
                 ->count();
         }
-
+    
         // Urutkan chatRooms berdasarkan waktu pesan terakhir (terbaru di atas)
         $chatRooms = $chatRooms->sortByDesc(function($room) {
             return $room->lastMessage ? $room->lastMessage->created_at : Carbon::now();
         });
-
-        return view('mainpage.chatting.index', compact('chatRooms'));
+    
+        // Mengecek apakah ada notifikasi baru
+        $hasNotification = TrMessages::whereIn('room_id', $chatRooms->pluck('id'))
+            ->where('sender_id', '!=', $user_id)
+            ->where('isRead', 0)
+            ->exists();
+    
+        // Mengembalikan tampilan bersama data notifikasi
+        return view('mainpage.chatting.index', [
+            'chatRooms' => $chatRooms,
+            'hasNotification' => $hasNotification
+        ]);
     }
+
 
     
     // Membuat atau membuka room chat
@@ -129,15 +142,23 @@ class ChattingController extends Controller
             'image' => $imagePath,
             'file' => $filePath
         ]);
+        event(new MessageReceived($message)); // Event yang mengirim notifikasi
         
-        $message->refresh();           // ambil ulang data dari DB (pastikan created_at terisi)
-        $message->load('sender');      // pastikan relasi sender ikut dimuat
+        // Ambil pesan yang sudah dibuat
+        $receiverId = ($chatRoom->student_id == $user_id) ? $chatRoom->tutor_id : $chatRoom->student_id;
         
-        $this->sendMessageToPusher($message);        
-
-        // Update last activity pada room chat
+        // Kirim ke Pusher
+        event(new \App\Events\ChatRoomUpdated($message, $receiverId));
+        
+        $message->refresh(); // Ambil ulang data dari DB
+        $message->load('sender'); // Muat relasi sender
+        
+        // Kirim pesan ke Pusher untuk update real-time
+        $this->sendMessageToPusher($message);
+        
+        // Update aktivitas terakhir pada room
         $chatRoom->update(['last_activity' => now()]);
-
+        
         // Redirect kembali ke halaman chat
         return redirect()->back();
     }
