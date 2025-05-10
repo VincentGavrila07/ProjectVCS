@@ -110,4 +110,22 @@ class ThreadController extends Controller
 
         return redirect()->route('forum.threads.index')->with('success', 'Thread berhasil dibuat!');
     }
+
+    public function destroy($id)
+{
+        if (session('role') != 3) {
+            return redirect()->route('forum.threads.index')->with('error', 'Anda tidak memiliki izin untuk menghapus thread.');
+        }
+
+        $thread = Thread::find($id);
+
+        if (!$thread) {
+            return redirect()->route('forum.threads.index')->with('error', 'Thread tidak ditemukan.');
+        }
+
+        $thread->delete();
+
+        return redirect()->route('forum.threads.index')->with('success', 'Thread berhasil dihapus.');
+    }
+
 }

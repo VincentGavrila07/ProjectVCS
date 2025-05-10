@@ -1,4 +1,7 @@
-@extends(session('role') == 2 ? 'layouts.pelajarPanel' : 'layouts.tutorPanel')
+@extends(
+    session('role') == 3 ? 'layouts.admin' : 
+    (session('role') == 2 ? 'layouts.pelajarPanel' : 'layouts.tutorPanel')
+)
 
 @section('content')
 <div class="max-w-4xl mx-auto px-4 py-8">
@@ -58,7 +61,6 @@
         @endphp
 
         @foreach ($parentComments as $post)
-            {{-- Komentar Utama --}}
             <div class="flex items-start gap-4 border-t pt-4">
                 <img src="{{ asset('storage/' . $post->image) }}"
                     class="w-10 h-10 rounded-full object-cover border border-blue-300 shadow-sm"
@@ -68,10 +70,24 @@
                     <p class="text-gray-700">{{ $post->content }}</p>
                     <p class="text-sm text-gray-400 mt-1">
                         {{ \Carbon\Carbon::parse($post->created_at)->diffForHumans() }}
-                        <button onclick="replyTo('{{ $post->username }}', {{ $post->id }})"
-                                class="ml-4 text-sm text-blue-500 font-medium hover:underline">
-                            Reply
-                        </button>
+
+                        @if (session('role') != 3)
+                            <button onclick="replyTo('{{ $post->username }}', {{ $post->id }})"
+                                    class="ml-4 text-sm text-blue-500 font-medium hover:underline">
+                                Reply
+                            </button>
+                        @endif
+
+                        @if (session('role') == 3)
+                            <form action="{{ route('forum.posts.destroy', $post->id) }}" method="POST" class="inline-block ml-4">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-red-500 hover:text-red-700">
+                                    Hapus
+                                </button>
+                            </form>
+                        @endif
+
                         @if (isset($groupedPosts[$post->id]))
                             <button onclick="toggleReplies({{ $post->id }})"
                                     id="toggle-btn-{{ $post->id }}"
@@ -93,10 +109,23 @@
                                     <p class="text-gray-700 text-sm">{{ $child->content }}</p>
                                     <div class="flex justify-between items-center mt-1">
                                         <p class="text-xs text-gray-400">{{ \Carbon\Carbon::parse($child->created_at)->diffForHumans() }}</p>
-                                        <button onclick="replyTo('{{ $child->username }}', {{ $post->id }})"
-                                                class="text-xs text-blue-500 hover:underline">
-                                            Reply
-                                        </button>
+
+                                        @if (session('role') != 3)
+                                            <button onclick="replyTo('{{ $child->username }}', {{ $post->id }})"
+                                                    class="text-xs text-blue-500 hover:underline">
+                                                Reply
+                                            </button>
+                                        @endif
+
+                                        @if (session('role') == 3)
+                                            <form action="{{ route('forum.posts.destroy', $child->id) }}" method="POST" class="inline-block ml-4">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-red-500 hover:text-red-700">
+                                                    Hapus
+                                                </button>
+                                            </form>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -106,31 +135,33 @@
             </div>
         @endforeach
 
-
-        {{-- Form Komentar --}}
-        <form id="commentForm" action="{{ route('forum.posts.store') }}" method="POST" class="pt-4 border-t mt-4">
-            @csrf
-            <input type="hidden" name="thread_id" value="{{ $thread->id }}">
-            <input type="hidden" name="parent_id" id="parent_id" value="">
-            <textarea name="content" id="commentContent" rows="3"
-                      class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-blue-400 focus:ring-2 focus:outline-none"
-                      placeholder="Tulis komentar kamu..." required></textarea>
-            <div class="flex justify-end mt-2">
-                <button type="button" id="cancelReplyBtn"
-                        onclick="cancelReply()"
-                        class="bg-transparent text-red-500 border border-black px-6 py-2 mr-2 rounded-full hover:bg-red-500 hover:text-white hover:border-white transition hidden">
-                    Batal Balas
-                </button>
-                <button type="submit"
-                        class="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition">
-                    Kirim Komentar
-                </button>
-            </div>
-        </form>
+        {{-- Form Komentar (Hanya untuk Non-Admin) --}}
+        @if (session('role') != 3)
+            <form id="commentForm" action="{{ route('forum.posts.store') }}" method="POST" class="pt-4 border-t mt-4">
+                @csrf
+                <input type="hidden" name="thread_id" value="{{ $thread->id }}">
+                <input type="hidden" name="parent_id" id="parent_id" value="">
+                <textarea name="content" id="commentContent" rows="3"
+                        class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-blue-400 focus:ring-2 focus:outline-none"
+                        placeholder="Tulis komentar kamu..." required></textarea>
+                <div class="flex justify-end mt-2">
+                    <button type="button" id="cancelReplyBtn"
+                            onclick="cancelReply()"
+                            class="bg-transparent text-red-500 border border-black px-6 py-2 mr-2 rounded-full hover:bg-red-500 hover:text-white hover:border-white transition hidden">
+                        Batal Balas
+                    </button>
+                    <button type="submit"
+                            class="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition">
+                        Kirim Komentar
+                    </button>
+                </div>
+            </form>
+        @endif
     </div>
 </div>
 
 {{-- Script --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     function replyTo(username, postId) {
         const textarea = document.getElementById('commentContent');
@@ -164,5 +195,6 @@
             toggleBtn.textContent = `Show Replies (${count})`;
         }
     }
+    
 </script>
 @endsection

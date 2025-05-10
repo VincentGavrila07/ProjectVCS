@@ -1,5 +1,7 @@
-@extends(session('role') == 2 ? 'layouts.pelajarPanel' : 'layouts.tutorPanel')
-
+@extends(
+    session('role') == 3 ? 'layouts.admin' : 
+    (session('role') == 2 ? 'layouts.pelajarPanel' : 'layouts.tutorPanel')
+)
 @section('content')
 <div class="w-full px-4 md:px-0 py-8">
     <div class="max-w-3xl mx-auto bg-white p-8 rounded-2xl shadow-lg">

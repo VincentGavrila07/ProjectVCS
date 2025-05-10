@@ -1,4 +1,7 @@
-@extends(session('role') == 2 ? 'layouts.pelajarPanel' : 'layouts.tutorPanel')
+@extends(
+    session('role') == 3 ? 'layouts.admin' : 
+    (session('role') == 2 ? 'layouts.pelajarPanel' : 'layouts.tutorPanel')
+)
 
 @section('content')
 <div class="py-4 px-4 max-w-5xl mx-auto">
@@ -9,7 +12,7 @@
             <h2 class="text-xl font-bold text-gray-800">Thread</h2>
             
             <form action="{{ route('forum.threads.index') }}" method="GET" class="flex w-full md:w-2/3">
-                <input type="text" name="search" placeholder="Cari tutor berdasarkan nama, judul forum, atau mata pelajaran..."
+                <input type="text" name="search" placeholder="Cari thread..."
                     class="w-full px-4 py-2 border border-r-0 rounded-l-lg focus:outline-none focus:ring-1 focus:ring-blue-300"
                     value="{{ request('search') }}">
                 <button type="submit"
@@ -28,87 +31,116 @@
             </a>
         </div>
     </div>
+
     @if(request('search'))
         <p class="text-sm text-gray-500 mb-4">
             Hasil pencarian untuk: <span class="font-semibold text-gray-800">"{{ request('search') }}"</span>
         </p>
     @endif
 
-
-
     {{-- Thread List --}}
     <div class="space-y-6">
         @forelse ($threads as $thread)
-            <div class="bg-white p-6 rounded-2xl shadow border-l-4 border-blue-100 hover:shadow-md transition duration-300 thread-card">
-                    {{-- Badge Kategori --}}
-                    @if($thread->thread_subject )
-            <span class="inline-block bg-blue-50 text-blue-600 text-sm font-medium rounded-full px-3 py-1 mb-3">
-                {{ $thread->thread_subject  }}
-            </span>
-        @else
-            <span class="inline-block bg-gray-100 text-gray-600 text-sm font-medium rounded-full px-3 py-1 mb-3">
-                General
-            </span>
-        @endif
+            <div class="bg-white p-6 rounded-2xl shadow border-l-4 border-blue-100 hover:shadow-md transition duration-300 relative thread-card">
+                
+                {{-- Badge Kategori --}}
+                <span class="inline-block bg-blue-50 text-blue-600 text-sm font-medium rounded-full px-3 py-1 mb-3">
+                    {{ $thread->thread_subject ?? 'General' }}
+                </span>
 
+                {{-- Judul Thread --}}
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                    <a href="{{ route('forum.threads.show', $thread->id) }}" class="hover:text-blue-600 transition">
+                        {{ $thread->title }}
+                    </a>
+                </h3>
 
-            {{-- Judul Thread --}}
-            <h3 class="text-lg font-semibold text-gray-800 mb-2">
-                <a href="{{ route('forum.threads.show', $thread->id) }}" class="hover:text-blue-600 transition">
-                    {{ $thread->title }}
-                </a>
-            </h3>
+                {{-- Preview Isi --}}
+                <p class="text-gray-600 mb-4">{{ Str::limit($thread->content, 70) }}</p>
 
-            {{-- Preview Isi --}}
-            <p class="text-gray-600 mb-4">{{ Str::limit($thread->content, 70) }}</p>
+                {{-- Footer Thread --}}
+                <div class="flex justify-between items-center text-sm">
+                    {{-- Profil --}}
+                    <div class="flex items-center gap-3">
+                        <img src="{{ asset('storage/' . $thread->image) }}"
+                            class="w-12 h-12 rounded-full border-4 border-blue-400 shadow-md object-cover"
+                            alt="Avatar {{ $thread->username }}">
+                        <div>
+                            <p class="text-gray-400">Ditulis oleh</p>
+                            <p class="font-semibold text-gray-800">{{ $thread->username }}  {{$thread->teacherid}}</p>
+                        </div>
+                    </div>
 
-            {{-- Footer Thread --}}
-            <div class="flex justify-between items-center text-sm">
-                {{-- Profil --}}
-                <div class="flex items-center gap-3">
-                    <img src="{{ asset('storage/' . $thread->image) }}"
-                        class="w-12 h-12 rounded-full border-4 border-blue-400 shadow-md object-cover"
-                        alt="Avatar {{ $thread->username }}">
-                    <div>
-                        <p class="text-gray-400">Ditulis oleh</p>
-                        <p class="font-semibold text-gray-800">{{ $thread->username }}  {{$thread->teacherid}}</p>
-                        
-                        @if($thread->role == 1)
-                            <p class="text-sm text-gray-500">
-                                Mengajar {{ $thread->user_subject ?? 'Tidak ada subject' }}
-                            </p>
-                        @endif
+                    {{-- Waktu --}}
+                    <div class="text-gray-400">
+                        {{ \Carbon\Carbon::parse($thread->created_at)->diffForHumans() }}
                     </div>
                 </div>
 
-
-                {{-- Waktu --}}
-                <div class="flex items-center gap-1 text-gray-400">
-                    <i class="bi bi-clock"></i>
-                    <span>{{ \Carbon\Carbon::parse($thread->created_at)->diffForHumans() }}</span>
-                </div>
+                {{-- Tindakan Admin --}}
+                @if(session('role') == 3)
+                    <form action="{{ route('forum.threads.destroy', $thread->id) }}" method="POST" class="absolute bottom-4 right-4 delete-form">
+                        @csrf
+                        @method('DELETE')
+                        <button type="button" class="text-red-500 hover:text-red-700 flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4m-4 4v12m4-12v12M1 7h22"></path>
+                            </svg>
+                            Hapus
+                        </button>
+                    </form>
+                @endif
             </div>
-        </div>
         @empty
-        {{-- Jika kosong --}}
         <div class="text-center py-16 text-gray-500">
-            <i class="bi bi-chat-dots text-4xl mb-4"></i>
-            <p class="mb-4">Belum ada thread yang dibuat. Yuk mulai diskusi!</p>
-            <a href="{{ route('forum.threads.create') }}"
-               class="inline-block border border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white transition px-6 py-2 rounded-full">
-                Buat Thread Pertama
-            </a>
+            <p>Belum ada thread yang dibuat. Yuk mulai diskusi!</p>
         </div>
         @endforelse
     </div>
 </div>
 
-{{-- Style --}}
+{{-- SweetAlert2 --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.querySelectorAll('.delete-form').forEach(form => {
+        form.querySelector('button').addEventListener('click', function(e) {
+            e.preventDefault();
+
+            Swal.fire({
+                title: 'Yakin ingin menghapus?',
+                text: "Thread yang dihapus tidak dapat dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+
+    // Tampilkan notifikasi jika ada session 'success'
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: "{{ session('success') }}",
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#3085d6',
+        });
+    @endif
+</script>
+
+
 <style>
     .thread-card {
         transition: all 0.3s ease-in-out;
-        border-left: 5px solid #0d6efd20;
-        border-radius: 16px;
+        padding-bottom: 2.5rem;
     }
 
     .thread-card:hover {
@@ -116,8 +148,16 @@
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
     }
 
-    .rounded-circle {
-        object-fit: cover;
+    .delete-form button {
+        background-color: #f8d7da;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: background-color 0.3s;
+    }
+
+    .delete-form button:hover {
+        background-color: #f5c2c7;
     }
 </style>
 @endsection

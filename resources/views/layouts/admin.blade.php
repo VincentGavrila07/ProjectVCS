@@ -66,6 +66,13 @@
                     </a>
                 </li>
                 <li>
+                    <a href="{{ route('forum.threads.index') }}"
+                    class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded 
+                            {{ Route::is('forum.*') ? 'bg-yellow-500 text-white' : '' }}">
+                        Thread
+                    </a>
+                </li>
+                <li>
                     <a href="{{ route('userList') }}" class="block py-2 px-4 mt-2 hover:bg-gray-700 rounded {{ Request::is('admin/userList') ? 'bg-yellow-500' : '' }}">
                         Daftar User
                     </a>

@@ -86,14 +86,14 @@ const HeroSection = () => {
         >
           <motion.button
             className="px-4 py-2 sm:px-6 sm:py-2 bg-white text-black rounded-lg hover:bg-blue-600 hover:text-white transition font-bold"
-            onClick={() => window.location.href = "/produk"}
+            onClick={() => window.location.href = "/login"}
           >
             VCS Sekarang
           </motion.button>
 
           <motion.button
             className="px-4 py-2 sm:px-6 sm:py-2 border border-white text-white rounded-lg hover:bg-blue-600 hover:text-white hover:border-none transition font-bold"
-            onClick={() => window.open("https://wa.me/6281282018322", "_blank")}
+            onClick={() => window.open("https://wa.me/6287881178344", "_blank")}
           >
             Hubungi
           </motion.button>

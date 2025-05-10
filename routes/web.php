@@ -118,8 +118,9 @@ Route::middleware(['check.session'])->group(function () {
         Route::get('/threads/create', [ThreadController::class, 'create'])->name('threads.create');
         Route::post('/threads', [ThreadController::class, 'store'])->name('threads.store');
         Route::get('/threads/{id}', [ThreadController::class, 'show'])->name('threads.show');
-    
         Route::post('/threads/posts', [PostController::class, 'store'])->name('posts.store');
+        Route::delete('forum/threads/{id}', [ThreadController::class, 'destroy'])->name('threads.destroy');
+        Route::delete('/forum/posts/{id}', [PostController::class, 'destroy'])->name('posts.destroy');
     });
     
 });

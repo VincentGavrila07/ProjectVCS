@@ -26,6 +26,23 @@ class PostController extends Controller
         return redirect()->back()->with('success', 'Komentar berhasil dikirim.');
     }
 
+    public function destroy($id)
+    {
+        if (session('role') != 3) {
+            return redirect()->back()->with('error', 'Anda tidak memiliki izin untuk menghapus komentar.');
+        }
+
+        $post = Post::find($id);
+
+        if (!$post) {
+            return redirect()->back()->with('error', 'Komentar tidak ditemukan.');
+        }
+
+        $post->delete();
+
+        return redirect()->back()->with('success', 'Komentar berhasil dihapus.');
+    }
+
 
 
 }
