@@ -123,7 +123,11 @@ Route::middleware(['check.session'])->group(function () {
         Route::delete('/forum/posts/{id}', [PostController::class, 'destroy'])->name('posts.destroy');
     });
     
+
+    Route::get('/pelajar/transaksi', [TransaksiController::class, 'historyTransaksi'])->name('pelajar.transaksiList');
+    Route::post('/transaksi/{id}/rating', [TransaksiController::class, 'submitRating'])->name('submitRating');
 });
+
 Route::match(['get', 'post'], '/wallet/handle-notification', [WalletController::class, 'handleNotification'])->name('wallet.handle.notification');
 
 // ------------------------------------------- Database Connection Check -------------------------------------------

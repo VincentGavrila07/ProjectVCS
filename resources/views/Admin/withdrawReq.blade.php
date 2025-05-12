@@ -6,17 +6,18 @@
     <!-- Panel Pencarian -->
     <form method="GET" action="{{ route('withdrawList') }}" class="mb-4">
         <div class="flex items-center">
-            <input type="text" name="search" value="{{ request()->input('search') }}" placeholder="Cari berdasarkan ID, nama, rekening, atau jumlah uang" class="border px-4 py-2 rounded-lg mr-2 w-96">
+            <input type="text" name="search" value="{{ request()->input('search') }}" placeholder="Cari berdasarkan ID, nama, bank, rekening, atau jumlah uang" class="border px-4 py-2 rounded-lg mr-2 w-96">
             <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">
                 <i class="fas fa-search"></i>
             </button>
         </div>
     </form>
 
-    <!-- Tabel Data Withdraw -->
-    <table class="table-auto border-collapse border border-gray-400 w-full">
+    <!-- Tabel Withdraw Processing -->
+    <h3 class="text-xl font-semibold mt-6">Withdraw Processing</h3>
+    <table class="table-auto border-collapse border border-gray-400 w-full mb-4">
         <thead>
-            <tr class="bg-gray-900 text-white"> <!-- Ubah warna header -->
+            <tr class="bg-gray-900 text-white">
                 <th class="border border-gray-700 px-4 py-2 text-left">ID</th>
                 <th class="border border-gray-700 px-4 py-2 text-left">Nama</th>
                 <th class="border border-gray-700 px-4 py-2 text-left">Bank</th>
@@ -29,8 +30,8 @@
             </tr>
         </thead>
         <tbody>
-            @forelse ($withdraws as $withdraw)
-                <tr class="bg-gray-100"> <!-- Warna latar belakang baris -->
+            @forelse ($withdrawsProcessing as $withdraw)
+                <tr class="bg-gray-100">
                     <td class="border border-gray-300 px-4 py-2">{{ $withdraw->id }}</td>
                     <td class="border border-gray-300 px-4 py-2">{{ $withdraw->username }}</td>
                     <td class="border border-gray-300 px-4 py-2">{{ $withdraw->bank_name }}</td>
@@ -59,11 +60,67 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="8" class="text-center py-4 text-gray-600">Tidak ada permintaan withdraw.</td>
+                    <td colspan="9" class="text-center py-4 text-gray-600">Tidak ada permintaan withdraw yang sedang diproses.</td>
                 </tr>
             @endforelse
         </tbody>
     </table>
+
+    <!-- Pagination for Processing Withdraws -->
+    <div class="mt-4">
+        {{ $withdrawsProcessing->links() }}
+    </div>
+
+    <!-- Tabel Withdraw Done -->
+    <h3 class="text-xl font-semibold mt-6">Withdraw Done</h3>
+    <table class="table-auto border-collapse border border-gray-400 w-full">
+        <thead>
+            <tr class="bg-gray-900 text-white">
+                <th class="border border-gray-700 px-4 py-2 text-left">ID</th>
+                <th class="border border-gray-700 px-4 py-2 text-left">Nama</th>
+                <th class="border border-gray-700 px-4 py-2 text-left">Bank</th>
+                <th class="border border-gray-700 px-4 py-2 text-left">Rekening</th>
+                <th class="border border-gray-700 px-4 py-2 text-left">Email</th>
+                <th class="border border-gray-700 px-4 py-2 text-left">Jumlah</th>
+                <th class="border border-gray-700 px-4 py-2 text-left">Status</th>
+                <th class="border border-gray-700 px-4 py-2 text-left">Dibuat</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse ($withdrawsDone as $withdraw)
+                <tr class="bg-gray-100">
+                    <td class="border border-gray-300 px-4 py-2">{{ $withdraw->id }}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{ $withdraw->username }}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{ $withdraw->bank_name }}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{ $withdraw->account_number }}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{ $withdraw->email }}</td>
+                    <td class="border border-gray-300 px-4 py-2">Rp {{ number_format($withdraw->amount, 0, ',', '.') }}</td>
+                    <td class="border border-gray-300 px-4 py-2 text-center">
+                        @php
+                            $statusColors = [
+                                'processing' => 'bg-yellow-500 text-white',
+                                'done' => 'bg-green-500 text-white',
+                                'canceled' => 'bg-red-500 text-white'
+                            ];
+                        @endphp
+                        <span class="px-3 py-1 rounded-lg {{ $statusColors[$withdraw->status] ?? 'bg-gray-500 text-white' }}">
+                            {{ ucfirst($withdraw->status) }}
+                        </span>
+                    </td>
+                    <td class="border border-gray-300 px-4 py-2">{{ $withdraw->created_at }}</td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="8" class="text-center py-4 text-gray-600">Tidak ada permintaan withdraw yang selesai.</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+
+    <!-- Pagination for Done Withdraws -->
+    <div class="mt-4">
+        {{ $withdrawsDone->links() }}
+    </div>
 
     <!-- Modal Edit Withdraw -->
     <div id="withdrawModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 hidden flex items-center justify-center" onclick="closeModal(event)">
@@ -97,10 +154,6 @@
         </div>
     </div>
 
-    <!-- Pagination -->
-    <div class="mt-4">
-        {{ $withdraws->links() }}
-    </div>
 @endsection
 
 <script>

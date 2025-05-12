@@ -91,17 +91,30 @@ class WalletController extends Controller
         return back()->with('success', 'Permintaan withdraw sedang diproses.');
     }
     
-    public function updateWithdrawStatus(Request $request, $id)
-    {
-        $request->validate([
-            'status' => 'required|in:processing,canceled,done',
-        ]);
-    
-        $withdraw = MsWithdraw::findOrFail($id);
-        $withdraw->update(['status' => $request->status]);
-    
-        return back()->with('success', 'Status withdraw berhasil diperbarui.');
+public function updateWithdrawStatus(Request $request, $id)
+{
+    $request->validate([
+        'status' => 'required|in:processing,canceled,done',
+    ]);
+
+    $withdraw = MsWithdraw::findOrFail($id);
+    $wallet = Wallet::where('user_id', $withdraw->user_id)->first();
+
+    if ($request->status === 'done') {
+        // Kurangi saldo hanya saat status menjadi 'done'
+        if ($wallet && $wallet->balance >= $withdraw->amount) {
+            $wallet->balance -= $withdraw->amount;
+            $wallet->save();
+        } else {
+            return back()->with('error', 'Saldo tidak cukup atau data tidak ditemukan.');
+        }
     }
+
+    $withdraw->update(['status' => $request->status]);
+
+    return back()->with('success', 'Status withdraw berhasil diperbarui.');
+}
+
     
 
     public function processWithdrawPelajar(Request $request)
@@ -117,7 +130,7 @@ class WalletController extends Controller
     private function processWithdraw(Request $request, $role)
     {
         $userId = session('id');
-    
+
         // Validasi input
         $request->validate([
             'amount' => 'required|numeric|min:10000', // Minimal withdraw Rp 10.000
@@ -125,15 +138,15 @@ class WalletController extends Controller
             'bank' => 'required|string',
             'account_name' => 'required|string',
         ]);
-    
+
         // Ambil saldo pengguna
         $wallet = Wallet::where('user_id', $userId)->first();
-    
+
         if (!$wallet || $wallet->balance < $request->amount) {
             return response()->json(['success' => false, 'message' => 'Saldo tidak cukup'], 400);
         }
-    
-        // Simpan permintaan withdraw ke database
+
+        // Simpan permintaan withdraw ke database tanpa mengurangi saldo
         MsWithdraw::create([
             'user_id' => $userId,
             'amount' => $request->amount,
@@ -143,11 +156,7 @@ class WalletController extends Controller
             'status' => 'processing', // Status default processing
             'role' => $role // Menyimpan apakah ini withdraw pelajar atau tutor
         ]);
-    
-        // Kurangi saldo di wallet
-        $wallet->balance -= $request->amount;
-        $wallet->save();
-    
+
         return response()->json(['success' => true, 'message' => 'Permintaan withdraw sedang diproses']);
     }
     

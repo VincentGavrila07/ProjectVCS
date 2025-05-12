@@ -230,7 +230,7 @@ class AdminController extends Controller
     }
     
 
-    public function withdrawList(Request $request)
+   public function withdrawList(Request $request)
     {
         $query = DB::table('MsWithdraw')
             ->join('MsUser', 'MsWithdraw.user_id', '=', 'MsUser.id')
@@ -244,27 +244,29 @@ class AdminController extends Controller
                 'MsWithdraw.status',
                 'MsWithdraw.created_at'
             );
-    
+
         // Pencarian
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('MsWithdraw.id', 'like', "%$search%")
-                  ->orWhere('MsUser.username', 'like', "%$search%")
-                  ->orWhere('MsUser.email', 'like', "%$search%")
-                  ->orWhere('MsUser.bank_name', 'like', "%$search%")
-                  ->orWhere('MsWithdraw.amount', 'like', "%$search%");
+                ->orWhere('MsUser.username', 'like', "%$search%")
+                ->orWhere('MsUser.email', 'like', "%$search%")
+                ->orWhere('MsWithdraw.bank_name', 'like', "%$search%")
+                ->orWhere('MsWithdraw.amount', 'like', "%$search%");
             });
         }
-    
-        // Sorting
-        $sortColumn = $request->input('sort', 'MsWithdraw.id'); // Default sort by ID
-        $query->orderBy($sortColumn, 'asc');
-    
-        // Ambil data dengan pagination
-        $withdraws = $query->paginate(10);
-    
-        return view('admin.withdrawReq', compact('withdraws'));
+
+        // Withdraw Processing
+        $withdrawsProcessing = clone $query;
+        $withdrawsProcessing = $withdrawsProcessing->where('MsWithdraw.status', 'processing')->paginate(10, ['*'], 'processing_page');
+
+        // Withdraw Done
+        $withdrawsDone = clone $query;
+        $withdrawsDone = $withdrawsDone->where('MsWithdraw.status', 'done')->paginate(10, ['*'], 'done_page');
+
+        return view('admin.withdrawReq', compact('withdrawsProcessing', 'withdrawsDone'));
     }
+
     
     
     

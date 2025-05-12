@@ -16,11 +16,32 @@
         <div class="flex justify-center items-center mt-2 text-gray-500 text-sm">
             <span class="font-bold">
                 Bergabung {{ $tutor->experience }}
+                <span class="ml-3 flex items-center">
+                    @php
+                        $rating = $tutor->ratingtutor ?? 0; // Mengambil rating atau 0 jika tidak ada
+                        $fullStars = floor($rating); // Bintang penuh
+                        $emptyStars = 5 - $fullStars; // Bintang kosong
+                    @endphp
+
+                    <!-- Bintang penuh -->
+                    @for ($i = 0; $i < $fullStars; $i++)
+                        <span class="text-yellow-500">★</span>
+                    @endfor
+
+                    <!-- Bintang kosong -->
+                    @for ($i = 0; $i < $emptyStars; $i++)
+                        <span class="text-gray-300">★</span>
+                    @endfor
+
+                    <!-- Menampilkan rating angka di samping bintang -->
+                    <span class="ml-2 text-gray-700">({{ $rating }})</span>
+
+                    <!-- Jika rating kosong, tampilkan "Belum ada rating" -->
+                    @if ($rating == 0)
+                        <span class="text-gray-500 ml-2">Belum ada rating</span>
+                    @endif
             </span>
-            <span class="ml-3">👍 97%</span>
         </div>
-
-
         <p class="text-sm text-gray-700 font-medium mt-2">
             {{ $tutor->price ? 'Rp ' . number_format($tutor->price, 0, ',', '.') . '/jam' : 'Gratis' }}
         </p>

@@ -11,7 +11,7 @@ class MsUser extends Model
     use HasFactory;
 
     protected $table = 'msuser'; 
-    protected $fillable = ['username', 'password', 'email', 'role','TeacherId','subjectClass','isAvailable']; 
+    protected $fillable = ['username', 'password', 'email', 'role','TeacherId','subjectClass','isAvailable','Rating']; 
 
     protected $primaryKey = 'id'; 
 
@@ -46,5 +46,11 @@ class MsUser extends Model
         return $this->hasMany(TrMessages::class, 'sender_id');
     }
 
-    
+    public function calculateAverageRating()
+    {
+        return $this->hasMany(Transaction::class, 'tutor_id')
+                    ->whereNotNull('rating')
+                    ->avg('rating');
+    }
+
 }

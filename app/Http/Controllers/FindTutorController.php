@@ -66,29 +66,30 @@ class FindTutorController extends Controller
 
 
     public function getTutors()
-{
-    $tutors = DB::table('msuser')
-        ->where('role', 1)
-        ->where('isAvailable', 1)
-        ->leftJoin('mssubject', 'msuser.subjectClass', '=', 'mssubject.id')
-        ->select(
-            'msuser.*',
-            'mssubject.subjectName as subject_name',
-            DB::raw("
-                CASE 
-                    WHEN TIMESTAMPDIFF(YEAR, msuser.created_at, NOW()) > 0 
-                        THEN CONCAT(TIMESTAMPDIFF(YEAR, msuser.created_at, NOW()), ' tahun')
-                    WHEN TIMESTAMPDIFF(MONTH, msuser.created_at, NOW()) > 0 
-                        THEN CONCAT(TIMESTAMPDIFF(MONTH, msuser.created_at, NOW()), ' bulan')
-                    WHEN TIMESTAMPDIFF(DAY, msuser.created_at, NOW()) > 0 
-                        THEN CONCAT(TIMESTAMPDIFF(DAY, msuser.created_at, NOW()), ' hari')
-                    ELSE '1 hari'
-                END as experience
-            ")
-        )
-        ->get();
-
-    return view('mainpage.pelajar.tutorList', compact('tutors'));
-}
+    {
+        $tutors = DB::table('msuser')
+            ->where('role', 1)
+            ->where('isAvailable', 1)
+            ->leftJoin('mssubject', 'msuser.subjectClass', '=', 'mssubject.id')
+            ->select(
+                'msuser.*',
+                'mssubject.subjectName as subject_name',
+                DB::raw("IFNULL(msuser.rating, 0) as ratingtutor"), // Pastikan ratingnya diambil dengan alias yang benar
+                DB::raw("
+                    CASE 
+                        WHEN TIMESTAMPDIFF(YEAR, msuser.created_at, NOW()) > 0 
+                            THEN CONCAT(TIMESTAMPDIFF(YEAR, msuser.created_at, NOW()), ' tahun')
+                        WHEN TIMESTAMPDIFF(MONTH, msuser.created_at, NOW()) > 0 
+                            THEN CONCAT(TIMESTAMPDIFF(MONTH, msuser.created_at, NOW()), ' bulan')
+                        WHEN TIMESTAMPDIFF(DAY, msuser.created_at, NOW()) > 0 
+                            THEN CONCAT(TIMESTAMPDIFF(DAY, msuser.created_at, NOW()), ' hari')
+                        ELSE '1 hari'
+                    END as experience
+                ")
+            )
+            ->get();
+            
+        return view('mainpage.pelajar.tutorList', compact('tutors'));
+    }
 
 }

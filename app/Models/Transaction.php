@@ -13,6 +13,7 @@ class Transaction extends Model
         'tutor_id',
         'amount',
         'status',
+        'rating'
     ];
 
     public function subject()

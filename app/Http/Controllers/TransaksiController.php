@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\Transaction;
+use App\Models\MsUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -43,54 +44,97 @@ class TransaksiController extends Controller
 
     public function historyTransaksi(Request $request)
     {
-        // Ambil ID dan role pengguna dari session
         $userId = session('id'); 
         $role = session('role'); 
-    
-        // Pastikan hanya role 1 (Tutor) dan role 2 (Pelajar) yang bisa mengakses
+
         if ($role == 1) {
-            // Jika Tutor (role 1), filter berdasarkan tutor_id
             $query = DB::table('transactions')
                 ->where('transactions.tutor_id', $userId);
             $view = 'mainpage.tutor.historyTransaction';
         } elseif ($role == 2) {
-            // Jika Pelajar (role 2), filter berdasarkan student_id
             $query = DB::table('transactions')
                 ->where('transactions.student_id', $userId);
             $view = 'mainpage.pelajar.historyTransaction';
         } else {
-            // Jika bukan role 1 atau 2, kembalikan dengan abort atau redirect ke dashboard
             return abort(403, 'Akses tidak diizinkan'); 
         }
-    
-        // Cek apakah ada pencarian berdasarkan id atau lawan transaksi
+
+        // Filter Pencarian untuk Transaksi Utama
         if ($request->has('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
                 $q->where('transactions.id', 'LIKE', "%{$search}%")
-                  ->orWhere('transactions.student_id', 'LIKE', "%{$search}%")
-                  ->orWhere('transactions.tutor_id', 'LIKE', "%{$search}%");
+                ->orWhere('transactions.student_id', 'LIKE', "%{$search}%")
+                ->orWhere('transactions.tutor_id', 'LIKE', "%{$search}%");
             });
         }
-    
-        // Join dengan tabel msuser untuk mendapatkan student_name dan tutor_name
+
+        // Query Transaksi Utama dengan Pagination
         $transactions = $query
             ->leftJoin('roomzoomcall', 'transactions.id', '=', 'roomzoomcall.transaction_id')
-            ->leftJoin('msuser as student', 'transactions.student_id', '=', 'student.id') // Join untuk student
-            ->leftJoin('msuser as tutor', 'transactions.tutor_id', '=', 'tutor.id') // Join untuk tutor
+            ->leftJoin('msuser as student', 'transactions.student_id', '=', 'student.id')
+            ->leftJoin('msuser as tutor', 'transactions.tutor_id', '=', 'tutor.id')
             ->select(
                 'transactions.*', 
                 'roomzoomcall.meeting_url',
-                'student.username as student_name', // Ambil username student
-                'tutor.username as tutor_name' // Ambil username tutor
+                'student.username as student_name',
+                'tutor.username as tutor_name'
             )
             ->orderBy('transactions.created_at', 'desc')
             ->paginate(10);
-    
-        // Return ke view yang sesuai dengan role
-        return view($view, compact('transactions'));
+
+        // Query Transaksi Belum Diberi Rating dengan Pagination
+        $unratedTransactions = DB::table('transactions')
+            ->where('transactions.status', 'confirmed')
+            ->whereNull('transactions.rating')
+            ->where(function ($q) use ($userId, $role) {
+                if ($role == 1) {
+                    $q->where('transactions.tutor_id', $userId);
+                } elseif ($role == 2) {
+                    $q->where('transactions.student_id', $userId);
+                }
+            })
+            ->leftJoin('msuser as tutor', 'transactions.tutor_id', '=', 'tutor.id')
+            ->select('transactions.id', 'transactions.created_at', 'tutor.username as tutor_name')
+            ->orderBy('transactions.created_at', 'desc')
+            ->paginate(5, ['*'], 'unrated_page'); // Gunakan page query parameter yang berbeda
+
+        return view($view, compact('transactions', 'unratedTransactions'));
     }
-    
-    
+
+    public function giveRating(Request $request, $transactionId)
+    {
+        $transaction = Transaction::find($transactionId);
+
+        if (!$transaction || $transaction->status !== 'DONE') {
+            return redirect()->back()->with('error', 'Transaksi tidak valid untuk diberikan rating.');
+        }
+
+        return view('ratingForm', compact('transaction'));
+    }
+
+    public function submitRating(Request $request, $transactionId)
+    {
+        $request->validate([
+            'rating' => 'required|numeric|min:1|max:5',
+        ]);
+
+        $transaction = Transaction::find($transactionId);
+
+        if (!$transaction || $transaction->status !== 'confirmed') {
+            return redirect()->back()->with('error', 'Transaksi tidak valid untuk diberikan rating.');
+        }
+
+        $transaction->rating = $request->input('rating');
+        $transaction->save();
+
+        $tutor = MsUser::find($transaction->tutor_id);
+        $tutor->Rating = $tutor->calculateAverageRating();
+        $tutor->save();
+
+        return redirect()->back()->with('success', 'Rating berhasil diberikan.');
+    }
+
+
     
 }
