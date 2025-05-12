@@ -40,6 +40,7 @@ class LoginController extends Controller
             'TeacherId' => $user->TeacherId ?? null,
             'price' => $user->price ?? null, 
             'subjectClass' => $user->subjectClass,
+            'rating' => $user->Rating,
         ]);
         
     

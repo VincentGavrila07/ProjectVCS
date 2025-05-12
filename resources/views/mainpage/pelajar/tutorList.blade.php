@@ -18,15 +18,21 @@
                 Bergabung {{ $tutor->experience }}
                 <span class="ml-3 flex items-center">
                     @php
-                        $rating = $tutor->ratingtutor ?? 0; // Mengambil rating atau 0 jika tidak ada
+                        $rating = number_format($tutor->ratingtutor ?? 0, 1); // Rating dengan 1 angka di belakang koma
                         $fullStars = floor($rating); // Bintang penuh
-                        $emptyStars = 5 - $fullStars; // Bintang kosong
+                        $halfStar = ($rating - $fullStars) >= 0.5 ? 1 : 0; // Bintang setengah
+                        $emptyStars = 5 - $fullStars - $halfStar; // Bintang kosong
                     @endphp
 
                     <!-- Bintang penuh -->
                     @for ($i = 0; $i < $fullStars; $i++)
                         <span class="text-yellow-500">★</span>
                     @endfor
+
+                    <!-- Bintang setengah -->
+                    @if ($halfStar)
+                        <span class="text-yellow-500">⯨</span> <!-- Menggunakan karakter setengah bintang -->
+                    @endif
 
                     <!-- Bintang kosong -->
                     @for ($i = 0; $i < $emptyStars; $i++)
@@ -40,7 +46,7 @@
                     @if ($rating == 0)
                         <span class="text-gray-500 ml-2">Belum ada rating</span>
                     @endif
-            </span>
+                </span>
         </div>
         <p class="text-sm text-gray-700 font-medium mt-2">
             {{ $tutor->price ? 'Rp ' . number_format($tutor->price, 0, ',', '.') . '/jam' : 'Gratis' }}

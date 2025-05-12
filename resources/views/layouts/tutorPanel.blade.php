@@ -54,6 +54,23 @@
                 <div class="text-center">
                     <p class="font-semibold text-lg">{{ session('username') }}</p>
                     <p class="text-gray-400 text-sm">{{ session('email') }}</p>
+                    <div class="flex items-center space-x-1">
+                        @php
+                            $rating = number_format(session('rating') ?? 0, 1);
+                        @endphp
+
+                        @for ($i = 1; $i <= 5; $i++)
+                            @if ($i <= floor($rating))
+                                <i class="fas fa-star text-yellow-400 text-xl"></i>
+                            @elseif ($i - $rating < 1)
+                                <i class="fas fa-star-half-alt text-yellow-400 text-xl"></i>
+                            @else
+                                <i class="far fa-star text-gray-300 text-xl"></i>
+                            @endif
+                        @endfor
+
+                        <span class="ml-2 text-gray-600 text-sm font-semibold">{{ $rating }}/5</span>
+                    </div>
                 </div>
             </div>
             
