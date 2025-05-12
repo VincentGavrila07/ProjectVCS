@@ -68,7 +68,22 @@ const TutorSlider = () => {
                                             <FaClock className="mr-1" /> {tutor.experience} 
                                         </span>
                                         <span className="flex items-center">
-                                            <FaThumbsUp className="mr-1" /> {tutor.rating}%
+                                            {Array.from({ length: 5 }).map((_, index) => {
+                                                const isFullStar = index < Math.floor(tutor.Rating);
+                                                const isHalfStar = index === Math.floor(tutor.Rating) && tutor.Rating % 1 !== 0;
+                                                return (
+                                                    <span key={index} className="text-lg">
+                                                        {isFullStar ? (
+                                                            <span className="text-yellow-500">★</span>
+                                                        ) : isHalfStar ? (
+                                                            <span className="text-yellow-500">☆</span>
+                                                        ) : (
+                                                            <span className="text-gray-300">★</span>
+                                                        )}
+                                                    </span>
+                                                );
+                                            })}
+                                            <span className="ml-2 text-gray-700">({tutor.Rating.toFixed(1)})</span>
                                         </span>
                                     </div>
                                     <div className="mt-2 text-blue-600 font-bold text-lg">

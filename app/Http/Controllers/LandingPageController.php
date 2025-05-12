@@ -17,6 +17,7 @@ class LandingPageController extends Controller
                 'msuser.id',
                 'msuser.username as name',
                 'msuser.price',
+                'msuser.Rating',
                 DB::raw("IFNULL(CONCAT('".url('storage')."/', msuser.image), '".url('images/user.jpg')."') as image"),
                 'mssubject.subjectName as specialty',
                 DB::raw("
