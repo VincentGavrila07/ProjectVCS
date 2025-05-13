@@ -27,11 +27,21 @@ class WalletController extends Controller
             return redirect()->route('login')->with('error', 'Anda harus login terlebih dahulu.');
         }
 
+        // Ambil data wallet untuk user yang sedang login
         $wallet = Wallet::firstOrCreate(['user_id' => $userId], ['balance' => 0]);
+
+        // Ambil data withdraw untuk user yang sedang login
         $withdraws = MsWithdraw::where('user_id', $userId)->orderBy('created_at', 'desc')->get();
 
-        return view('mainpage.wallet.index', compact('wallet','withdraws'));
+        // Ambil data transaksi deposit untuk user yang sedang login
+        $transactions = WalletTransaction::where('user_id', $userId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Kirim data wallet, withdraws, dan transactions ke view
+        return view('mainpage.wallet.index', compact('wallet', 'withdraws', 'transactions'));
     }
+
     public function walletTutor()
     {
         $userId = session('id'); 

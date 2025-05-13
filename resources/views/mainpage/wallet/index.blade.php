@@ -24,6 +24,46 @@
             </button>
         </form>
     </div>
+
+         <!-- Tabel Data Deposit -->
+    <!-- Tabel Data Deposit -->
+    <div class="mt-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">History Deposit</h2>
+        <table class="table-auto border-collapse border border-gray-400 w-full mt-4">
+            <thead>
+                <tr class="bg-gray-800 text-white">
+                    <th class="border border-gray-300 px-4 py-2 text-left">ID</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Order ID</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Jumlah</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Status</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Dibuat</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($transactions as $transaction)
+                    <tr class="bg-gray-100">
+                        <td class="border border-gray-300 px-4 py-2">{{ $transaction->id }}</td>
+                        <td class="border border-gray-300 px-4 py-2">{{ $transaction->order_id }}</td>
+                        <td class="border border-gray-300 px-4 py-2">Rp {{ number_format($transaction->amount, 0, ',', '.') }}</td>
+                        <td class="border border-gray-300 px-4 py-2 text-center">
+                            <span class="px-3 py-1 rounded-lg 
+                                @if($transaction->status == 'settlement') bg-green-500 text-white 
+                                @elseif($transaction->status == 'pending') bg-yellow-500 text-white 
+                                @elseif($transaction->status == 'failed') bg-red-500 text-white 
+                                @endif">
+                                {{ ucfirst($transaction->status) }}
+                            </span>
+                        </td>
+                        <td class="border border-gray-300 px-4 py-2">{{ $transaction->created_at->format('Y-m-d H:i') }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-gray-600">Tidak ada transaksi deposit.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
@@ -97,5 +137,37 @@
             });
         });
     }
+fetch('/wallet/deposit/data')
+    .then(response => response.json())
+    .then(data => {
+        const tbody = document.querySelector('table tbody');
+        tbody.innerHTML = ''; // Clear the existing rows
+
+        if (data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-600">Tidak ada transaksi deposit.</td></tr>';
+        } else {
+            data.forEach(transaction => {
+                const row = document.createElement('tr');
+                row.classList.add('bg-gray-100');
+
+                row.innerHTML = `
+                    <td class="border border-gray-300 px-4 py-2">${transaction.id}</td>
+                    <td class="border border-gray-300 px-4 py-2">${transaction.order_id}</td>
+                    <td class="border border-gray-300 px-4 py-2">Rp ${transaction.amount.toLocaleString()}</td>
+                    <td class="border border-gray-300 px-4 py-2">
+                        ${transaction.status === 'settlement' ? '<span class="text-green-500 font-bold">Sukses</span>' : (transaction.status === 'pending' ? '<span class="text-yellow-500 font-bold">Pending</span>' : '<span class="text-red-500 font-bold">Gagal</span>')}
+                    </td>
+                    <td class="border border-gray-300 px-4 py-2">${new Date(transaction.created_at).toLocaleString()}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+    })
+    .catch(error => {
+        console.error("Error fetching deposit data:", error);
+    });
+
+
+
 </script>
 @endsection
