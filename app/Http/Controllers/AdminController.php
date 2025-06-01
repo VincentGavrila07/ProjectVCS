@@ -3,23 +3,95 @@
 namespace App\Http\Controllers;
 
 use App\Models\MsUser;
-
+use App\Models\Transaction;
 use App\Models\MsSubject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\WalletTransaction;
+use App\Models\MsWithdraw;
+use Carbon\Carbon;
 
 
 class AdminController extends Controller
 {
-    public function index()
-    {
-        // Menghitung jumlah user berdasarkan role
-        $role1Count = MsUser::where('role', 1)->count();
-        $role2Count = MsUser::where('role', 2)->count();
-        
-        // Mengirim data ke view
-        return view('Admin.index', compact('role1Count', 'role2Count'));  // Pastikan nama view-nya sesuai
+public function index(Request $request)
+{   $selectedMonth = $request->input('month');
+    // Total Users
+    $totalUsers = MsUser::count();
+
+    // Total Deposit (status: settlement)
+    $totalDeposit = WalletTransaction::where('status', 'settlement')->sum('amount');
+
+    // Total Withdraw (status: done)
+    $totalWithdraw = MsWithdraw::where('status', 'done')->sum('amount');
+
+    // Jumlah tutor dan pelajar
+    $role1Count = MsUser::where('role', 1)->count(); // Tutor
+    $role2Count = MsUser::where('role', 2)->count(); // Pelajar
+
+    // Deposit per bulan (settlement only)
+    $depositData = WalletTransaction::select(
+            DB::raw("DATE_FORMAT(created_at, '%b %Y') as month"),
+            DB::raw("SUM(amount) as total")
+        )
+        ->where('status', 'settlement')
+        ->groupBy(DB::raw("DATE_FORMAT(created_at, '%b %Y')"))
+        ->orderBy(DB::raw("MIN(created_at)"))
+        ->get();
+
+    $depositMonths = $depositData->pluck('month');
+    $depositTotals = $depositData->pluck('total');
+
+    // Withdraw per bulan (done only)
+    $withdrawData = MsWithdraw::select(
+            DB::raw("DATE_FORMAT(created_at, '%b %Y') as month"),
+            DB::raw("SUM(amount) as total")
+        )
+        ->where('status', 'done')
+        ->groupBy(DB::raw("DATE_FORMAT(created_at, '%b %Y')"))
+        ->orderBy(DB::raw("MIN(created_at)"))
+        ->get();
+
+    $withdrawMonths = $withdrawData->pluck('month');
+    $withdrawTotals = $withdrawData->pluck('total');
+
+ // Transaksi berhasil (confirmed)
+    $transactionQuery = Transaction::select(
+        DB::raw("DATE(created_at) as date"),
+        DB::raw("SUM(amount) as total")
+    )->where('status', 'confirmed');
+
+    if ($selectedMonth) {
+        $transactionQuery->whereMonth('created_at', date('m', strtotime($selectedMonth)))
+                         ->whereYear('created_at', date('Y', strtotime($selectedMonth)));
     }
+
+    $transactionData = $transactionQuery->groupBy('date')
+        ->orderBy('date')
+        ->get();
+
+    $transactionDates = $transactionData->pluck('date');
+    $transactionTotals = $transactionData->pluck('total');
+    $totalBalance = $totalDeposit - $totalWithdraw;
+    // Untuk dropdown filter bulan
+    $availableMonths = Transaction::where('status', 'confirmed')
+        ->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month"))
+        ->distinct()
+        ->orderBy('month', 'desc')
+        ->pluck('month');
+
+    return view('admin.index', compact(
+        'totalUsers', 'totalDeposit', 'totalWithdraw',
+        'role1Count', 'role2Count',
+        'depositMonths', 'depositTotals',
+        'withdrawMonths', 'withdrawTotals',
+        'transactionDates', 'transactionTotals',
+        'availableMonths', 'selectedMonth','totalBalance'
+    ));
+}
+
+
+
 
     public function userList(Request $request)
     {

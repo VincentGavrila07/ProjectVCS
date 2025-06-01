@@ -3,29 +3,61 @@
 @section('content')
 <div class="container mx-auto p-6">
     <div class="max-w-lg mx-auto bg-white rounded-lg shadow-lg p-6">
-        <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Deposit</h2>
         
-        <!-- Saldo Section -->
-        <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white mb-6">
-            <p class="text-sm font-semibold">Saldo {{ session('username') }} :</p>
-            <p class="text-2xl font-bold">Rp {{ number_format($wallet->balance, 0, ',', '.') }}</p>
-        </div>
+       <div class="bg-white rounded-xl shadow-lg p-8 space-y-6">
+            <h2 class="text-4xl font-extrabold text-center text-blue-700 mb-4">Deposit Saldo</h2>
 
-        <!-- Deposit Form -->
-        <form id="deposit-form" class="space-y-4">
-            <div>
-                <label for="amount" class="block text-sm font-medium text-gray-700">Jumlah Deposit</label>
-                <input type="number" id="amount" name="amount" min="10000" placeholder="Minimal Rp 10.000"
-                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+            <div class="flex flex-col items-center bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-lg p-6 shadow-md animate-fadeIn">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c1.657 0 3 .895 3 2s-1.343 2-3 2-3-.895-3-2 1.343-2 3-2z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 12v4m0 0a3 3 0 003 3h4m-7-7H5a3 3 0 00-3 3v1m7-7v-1m0 1v-1a3 3 0 00-3-3H5m0 0a3 3 0 013-3h4" />
+                </svg>
+                <p class="text-lg font-semibold">Saldo Anda</p>
+                <p id="saldo" class="text-3xl font-extrabold mt-1">Rp {{ number_format($wallet->balance, 0, ',', '.') }}</p>
             </div>
-            <button type="button" onclick="deposit()"
-                class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                Deposit
-            </button>
-        </form>
+
+            <form id="deposit-form" class="space-y-5" onsubmit="return false;">
+                <div>
+                    <label for="amount" class="block text-gray-700 font-semibold mb-1">Jumlah Deposit</label>
+                    <div class="relative">
+                        <input
+                            type="number"
+                            id="amount"
+                            name="amount"
+                            min="10000"
+                            placeholder="Minimal Rp 10.000"
+                            class="w-full px-5 py-3 border border-gray-300 rounded-xl shadow-sm text-lg font-semibold focus:outline-none focus:ring-4 focus:ring-blue-400 focus:border-blue-600"
+                            oninput="syncSlider(this.value)"
+                        />
+                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-semibold">Rp</span>
+                    </div>
+                </div>
+
+                <input
+                    type="range"
+                    id="amountRange"
+                    min="10000"
+                    max="1000000"
+                    step="5000"
+                    value="10000"
+                    class="w-full accent-blue-600"
+                    onchange="syncInput(this.value)"
+                />
+
+                <button
+                    type="button"
+                    onclick="deposit()"
+                    class="w-full py-4 bg-blue-600 hover:bg-blue-700 transition rounded-xl text-white font-extrabold text-xl shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-offset-2"
+                >
+                    Deposit Sekarang
+                </button>
+            </form>
+        </div>
+        <div class="text-sm text-gray-600 mt-2 text-center">
+            Minimal deposit: <span class="font-semibold text-blue-700">Rp 10.000</span>, maksimal: <span class="font-semibold text-blue-700">Rp 1.000.000</span>.
+        </div>
     </div>
 
-         <!-- Tabel Data Deposit -->
     <!-- Tabel Data Deposit -->
     <div class="mt-8">
         <h2 class="text-2xl font-bold text-gray-800 mb-4">History Deposit</h2>
@@ -70,6 +102,15 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+        function syncSlider(val) {
+        const slider = document.getElementById('amountRange');
+        slider.value = val < 10000 ? 10000 : val;
+    }
+
+    function syncInput(val) {
+        document.getElementById('amount').value = val;
+    }
+
     function deposit() {
         const amount = document.getElementById('amount').value;
 
@@ -79,6 +120,15 @@
                 icon: 'error',
                 title: 'Oops...',
                 text: 'Minimal deposit adalah Rp 10.000',
+            });
+            return;
+        }
+
+        if (amount > 1000000) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Maksimal deposit adalah Rp 1.000.000',
             });
             return;
         }

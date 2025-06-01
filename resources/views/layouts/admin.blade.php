@@ -47,9 +47,9 @@
                             alt="Profile Picture" 
                             class="w-24 h-24 rounded-full border-4 border-blue-400 shadow-md object-cover">
                     @else
-                        <img src="{{ asset('images/user.jpg') }}" 
+                        <img src="{{ asset('images/kucink.jpeg') }}" 
                             alt="Profile Picture" 
-                            class="w-24 h-24 rounded-full border-4 border-gray-300 shadow-md object-cover">
+                            class="w-24 h-24 rounded-full border-4 border-blue-600 shadow-md object-cover">
                     @endif
                 </div>
                 <div class="text-center">

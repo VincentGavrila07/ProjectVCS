@@ -19,7 +19,7 @@ class MsWithdraw extends Model
         'bank_name',
         'account_number',
         'account_name',
-        'status' // Pending, Approved, Rejected
+        'status' 
     ];
 
     // Relasi dengan User

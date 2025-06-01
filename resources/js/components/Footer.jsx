@@ -1,5 +1,5 @@
 import React from "react";
-import { FaFacebookF, FaTwitter, FaLinkedinIn } from "react-icons/fa";
+import { FaFacebookF, FaTwitter, FaLinkedinIn , FaMapMarkerAlt, FaPhoneAlt, FaEnvelope} from "react-icons/fa";
 
 const Footer = () => {
   return (
@@ -12,7 +12,6 @@ const Footer = () => {
             <h4 className="font-semibold mb-3">TENTANG KAMI</h4>
             <ul className="space-y-2 text-sm">
               <li><a href="#" className="hover-underline">Profil Perusahaan</a></li>
-              <li><a href="#" className="hover-underline">Syarat & Ketentuan</a></li>
               <li><a href="#" className="hover-underline">Kebijakan Privasi</a></li>
               <li><a href="#" className="hover-underline">Kontak</a></li>
             </ul>
@@ -38,12 +37,22 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Kolom 4 */}
+         {/* Kolom 4 */}
           <div>
             <h4 className="font-semibold mb-3">HUBUNGI KAMI</h4>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="hover-underline">Informasi Kontak</a></li>
-              <li><a href="#" className="hover-underline">Referensi</a></li>
+              <li className="flex items-center gap-2">
+                <FaMapMarkerAlt className="text-blue-500" />
+                Jl. Pendidikan No. 123, Jakarta
+              </li>
+              <li className="flex items-center gap-2">
+                <FaPhoneAlt className="text-blue-500" />
+                (021) 1234-5678
+              </li>
+              <li className="flex items-center gap-2">
+                <FaEnvelope className="text-blue-500" />
+                vcssupport@gmail.com
+              </li>
             </ul>
           </div>
 
@@ -67,11 +76,6 @@ const Footer = () => {
             {/* Hak Cipta dan Link */}
             <div className="text-sm">
               <p>© 2025 - Semua Hak Dilindungi</p>
-              <p className="mt-1">
-                <a href="#" className="hover-underline">Kebijakan Privasi</a> | 
-                <a href="#" className="hover-underline"> Syarat & Ketentuan</a> | 
-                <a href="#" className="hover-underline"> Kontak</a>
-              </p>
             </div>
 
             {/* Ikon Sosial Media */}
