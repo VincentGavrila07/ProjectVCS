@@ -27,7 +27,18 @@
     }
 </style>
 <body class="bg-gray-100">
-
+    @if (session('role') != 2)
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Access Denied',
+                text: 'Anda tidak memiliki akses ke halaman ini!',
+            }).then(() => {
+                window.location.href = '/';
+            });
+        </script>
+        @php exit; @endphp
+    @endif
     <div class="flex h-screen">
         <!-- Sidebar -->
        <!-- Sidebar -->

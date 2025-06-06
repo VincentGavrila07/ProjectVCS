@@ -40,11 +40,10 @@ try {
             'participant_video' => true,
             'mute_upon_entry' => false,
             'waiting_room' => false,
-            'auto_recording' => 'cloud', // Aktifkan perekaman otomatis
+            'auto_recording' => 'cloud', 
         ],
     ];
 
-    // Kirim request ke Zoom API
     $meetingResponse = $client->post('https://api.zoom.us/v2/users/me/meetings', [
         'headers' => [
             'Authorization' => 'Bearer ' . $accessToken,
