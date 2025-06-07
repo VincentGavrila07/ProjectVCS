@@ -172,17 +172,39 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function sewaTutor(tutorId) {
-    // Tampilkan konfirmasi sebelum menyewa
     Swal.fire({
         title: 'Konfirmasi Sewa Tutor',
-        text: 'Apakah Anda yakin ingin menyewa tutor ini?',
+        html: `
+            <div style="text-align: left;">
+                <p style="margin-bottom: 10px;">
+                    Apakah Anda yakin ingin menyewa tutor ini?
+                </p>
+                <div style="padding: 10px; background-color: #f8f9fa; border-left: 4px solid #ffc107; border-radius: 4px; margin-bottom: 15px;">
+                    <strong>Tips Keamanan:</strong><br>
+                    Jika terjadi hal mencurigakan selama sesi, segera ambil <em>screenshot</em> atau rekaman sebagai bukti untuk pelaporan.
+                </div>
+                <div style="margin-top: 10px;">
+                    <input type="checkbox" id="agreeCheckbox" style="margin-right: 8px;">
+                    <label for="agreeCheckbox">Saya menyetujui syarat & akan melaporkan jika terjadi pelanggaran.</label>
+                </div>
+            </div>
+        `,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'Ya, Sewa!',
-        cancelButtonText: 'Batal'
+        cancelButtonText: 'Batal',
+        buttonsStyling: true, // <-- aktifkan default Swal style
+        didOpen: () => {
+            const confirmBtn = Swal.getConfirmButton();
+            confirmBtn.disabled = true;
+
+            const checkbox = Swal.getPopup().querySelector('#agreeCheckbox');
+            checkbox.addEventListener('change', () => {
+                confirmBtn.disabled = !checkbox.checked;
+            });
+        }
     }).then((result) => {
         if (result.isConfirmed) {
-            // Jika pengguna menekan "Ya, Sewa!", lanjutkan ke proses sewa
             fetch('/sewa-tutor', {
                 method: 'POST',
                 headers: {
@@ -194,12 +216,15 @@ function sewaTutor(tutorId) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Tampilkan popup timer 20 detik
-                    let timer = 20;
+                    let timer = 15;
+                    let elapsed = 0;
+                    const pollingInterval = 3000;
+                    const maxTime = 15000;
+
                     Swal.fire({
                         title: 'Menunggu Konfirmasi Tutor',
                         html: `Tutor memiliki waktu <b>${timer}</b> detik untuk merespons.`,
-                        timer: 20000, // 20 detik
+                        timer: maxTime,
                         timerProgressBar: true,
                         showConfirmButton: false,
                         didOpen: () => {
@@ -207,75 +232,74 @@ function sewaTutor(tutorId) {
                             const timerInterval = setInterval(() => {
                                 timer--;
                                 timerElement.textContent = timer;
-                                if (timer <= 0) {
-                                    clearInterval(timerInterval);
-                                }
+                                if (timer <= 0) clearInterval(timerInterval);
                             }, 1000);
                         }
                     }).then((result) => {
                         if (result.dismiss === Swal.DismissReason.timer) {
-                            // Jika waktu habis, tampilkan pesan
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Transaksi Gagal',
                                 text: 'Tutor menolak atau tidak merespons dalam waktu yang ditentukan.',
-                                showConfirmButton: true,
                             });
                         }
                     });
 
-                    // Cek status transaksi secara berkala (polling)
                     const checkConfirmation = setInterval(() => {
-                        fetch('/check-transaction-status', { // Endpoint untuk memeriksa status transaksi
+                        elapsed += pollingInterval;
+                        if (elapsed >= maxTime) {
+                            clearInterval(checkConfirmation);
+                            return;
+                        }
+
+                        fetch('/check-transaction-status', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
                             },
-                            body: JSON.stringify({ transaction_id: data.transaction_id }) // Kirim transaction_id
+                            body: JSON.stringify({ transaction_id: data.transaction_id })
                         })
                         .then(response => response.json())
-                        .then(data => {
-                            console.log('Response from /check-transaction-status:', data); // Debugging
-                            if (data.status === 'confirmed') {
-                                clearInterval(checkConfirmation); // Hentikan polling
-                                window.location.href = data.video_call_url; // Redirect ke halaman video call
-                            } else if (data.status === 'rejected') {
-                                clearInterval(checkConfirmation); // Hentikan polling
+                        .then(statusData => {
+                            console.log('Polling result:', statusData);
+                            if (statusData.status === 'confirmed') {
+                                clearInterval(checkConfirmation);
+                                Swal.close();
+                                window.location.href = statusData.video_call_url;
+                            } else if (statusData.status === 'rejected') {
+                                clearInterval(checkConfirmation);
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Ditolak',
                                     text: 'Tutor menolak permintaan sewa Anda.',
-                                    showConfirmButton: true,
                                 });
                             }
                         })
-                        .catch(error => {
-                            console.error('Error saat memeriksa status transaksi:', error);
+                        .catch(err => {
+                            console.error('Polling error:', err);
                         });
-                    }, 3000); // Cek setiap 3 detik
+                    }, pollingInterval);
                 } else {
-                    // Jika gagal membuat transaksi, tampilkan pesan error
                     Swal.fire({
                         icon: 'error',
                         title: 'Oops...',
                         text: data.message || 'Terjadi kesalahan saat memproses permintaan.',
-                        showConfirmButton: true,
                     });
                 }
             })
             .catch(error => {
-                // Jika terjadi error saat mengirim request, tampilkan pesan error
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
                     text: 'Terjadi kesalahan saat menghubungi server.',
-                    showConfirmButton: true,
                 });
             });
         }
     });
 }
+
+
 
 </script>
 

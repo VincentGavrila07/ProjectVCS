@@ -66,3 +66,23 @@
 @empty
     <p class="text-center col-span-4 text-gray-500">Tidak ada tutor yang ditemukan.</p>
 @endforelse
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // Swal loading saat halaman dimuat
+    document.addEventListener('DOMContentLoaded', function () {
+        Swal.fire({
+            title: 'Memuat tutor...',
+            html: 'Mohon tunggu sebentar.',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        // Tutup Swal setelah konten benar-benar dirender (opsional: timer fallback)
+        setTimeout(() => {
+            Swal.close();
+        }, 3500); // atau kamu bisa ganti ini jadi observer kalau lebih dinamis
+    });
+</script>

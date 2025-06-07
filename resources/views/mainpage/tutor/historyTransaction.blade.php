@@ -19,6 +19,7 @@
             <tr class="bg-gray-800 text-white">
                 <th class="border border-gray-300 px-4 py-2">ID</th>
                 <th class="border border-gray-300 px-4 py-2">Student Name</th>
+                <th class="border border-gray-300 px-4 py-2">Subject Name</th>
                 <th class="border border-gray-300 px-4 py-2">Link Zoom</th>
                 <th class="border border-gray-300 px-4 py-2">Amount</th>
                 <th class="border border-gray-300 px-4 py-2">Status VCS</th>
@@ -30,6 +31,7 @@
                 <tr class="bg-gray-100">
                     <td class="border border-gray-300 px-4 py-2">{{ $transaction->id }}</td>
                     <td class="border border-gray-300 px-4 py-2">{{ $transaction->student_name }}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{ $transaction->subject_name }}</td>
                     <td class="border border-gray-300 px-4 py-2">{{ $transaction->meeting_url ?? 'Tidak Ada Meeting Url' }}</td>
                     <td class="border border-gray-300 px-4 py-2">{{ number_format($transaction->amount, 0, ',', '.') }}</td>
                     <td class="border border-gray-300 px-4 py-2">
@@ -75,4 +77,6 @@
     td{
         font-size: 14px;
     }
+
+    
 </style>

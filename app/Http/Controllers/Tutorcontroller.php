@@ -12,11 +12,63 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\RoomZoomCall;
 use GuzzleHttp\Client;
-
+use Carbon\Carbon;
+use App\Models\MsWithdraw;
 
 class TutorController extends Controller
 {
+public function dashboard()
+{
+    $tutorId = session('id');
 
+    // Ambil transaksi tutor yang sudah 'confirmed'
+    $transactions = Transaction::where('tutor_id', $tutorId)
+        ->where('status', 'confirmed')
+        ->get();
+
+    // Group data transaksi per bulan (format: YYYY-MM)
+    $monthlyTransactions = $transactions->groupBy(function($item) {
+        return $item->created_at->format('Y-m');
+    });
+
+    $months = [];
+    $transactionCounts = [];
+    $monthlyRevenue = [];
+
+    // Data 6 bulan terakhir
+    for ($i = 5; $i >= 0; $i--) {
+        $month = Carbon::now()->subMonths($i)->format('Y-m');
+        $months[] = Carbon::now()->subMonths($i)->format('M Y');
+
+        if (isset($monthlyTransactions[$month])) {
+            $count = $monthlyTransactions[$month]->count();
+            $sum = $monthlyTransactions[$month]->sum('amount');
+        } else {
+            $count = 0;
+            $sum = 0;
+        }
+
+        $transactionCounts[] = $count;
+        $monthlyRevenue[] = $sum;
+    }
+
+    $totalRevenue = $transactions->sum('amount');
+
+    // Ambil total withdraw tutor dari tabel mswithdraw, status 'done'
+    $totalWithdraw = MsWithdraw::where('user_id', $tutorId)
+        ->where('status', 'done')
+        ->sum('amount');
+
+    // Ambil saldo wallet tutor
+    $wallet = Wallet::where('user_id', $tutorId)->first();
+    $walletBalance = $wallet ? $wallet->balance : 0;
+
+    return view('mainpage.tutor.index', compact(
+        'months', 'transactionCounts', 'monthlyRevenue', 'totalRevenue',
+        'totalWithdraw', 'walletBalance'
+    ));
+}
+    
     public function toggleAvailability(Request $request)
     {
         // Ambil ID tutor dari session
@@ -71,37 +123,42 @@ class TutorController extends Controller
 
 
     public function sewaTutor(Request $request)
-{
-    $studentId = session('id'); // Ambil ID pelajar dari session
-    $tutorId = $request->input('tutor_id');
-    $amount = MsUser::find($tutorId)->price; // Ambil harga tutor
+    {
+        $studentId = session('id'); // Ambil ID pelajar dari session
+        $tutorId = $request->input('tutor_id');
+        $amount = MsUser::find($tutorId)->price; // Ambil harga tutor
+        $subjectId = MsUser::find($tutorId)->subjectClass; // Ambil subject_id dari tutor
+        $tutor = MsUser::find($tutorId);
+        // dd($subjectId);
+        // dd($tutor);
 
-    DB::beginTransaction();
-    try {
-        // Buat transaksi
-        $transaction = Transaction::create([
-            'student_id' => $studentId,
-            'tutor_id' => $tutorId,
-            'amount' => $amount,
-            'status' => 'pending',
-        ]);
+        DB::beginTransaction();
+        try {
+            // Buat transaksi
+            $transaction = Transaction::create([
+                'student_id' => $studentId,
+                'tutor_id' => $tutorId,
+                'amount' => $amount,
+                'status' => 'pending',
+                'subject_id' => (int)$subjectId,
+            ]);
 
-        // Kirim notifikasi ke tutor
-        Notification::create([
-            'user_id' => $tutorId,
-            'message' => 'Anda sedang disewa oleh pelajar. Silakan konfirmasi dalam 10 detik.',
-            'status' => 'unread',
-            'transaction_id' => $transaction->id, // Simpan transaction_id
-        ]);
+            // Kirim notifikasi ke tutor
+            Notification::create([
+                'user_id' => $tutorId,
+                'message' => 'Anda sedang disewa oleh pelajar. Silakan konfirmasi dalam 10 detik.',
+                'status' => 'unread',
+                'transaction_id' => $transaction->id, // Simpan transaction_id
+            ]);
 
-        DB::commit();
+            DB::commit();
 
-        return response()->json(['success' => true, 'transaction_id' => $transaction->id]);
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return response()->json(['success' => false, 'message' => $e->getMessage()]);
+            return response()->json(['success' => true, 'transaction_id' => $transaction->id]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
     }
-}
 
 public function checkNotification()
 {

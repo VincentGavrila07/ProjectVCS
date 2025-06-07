@@ -13,7 +13,8 @@ class Transaction extends Model
         'tutor_id',
         'amount',
         'status',
-        'rating'
+        'rating',
+        'subject_id'
     ];
 
     public function subject()
@@ -24,6 +25,16 @@ class Transaction extends Model
     public function roomZoomCall()
     {
         return $this->hasOne(RoomZoomCall::class, 'transaction_id', 'id');
+    }
+
+        public function student()
+    {
+        return $this->belongsTo(MsUser::class, 'student_id');
+    }
+
+    public function tutor()
+    {
+        return $this->belongsTo(MsUser::class, 'tutor_id');
     }
 
 

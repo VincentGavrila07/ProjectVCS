@@ -73,7 +73,7 @@ const HeroSection = () => {
           transition={{ duration: 1.2 }}
           viewport={{ once: false }}
         >
-          Kami menghadirkan sentuhan elegan yang menyempurnakan keindahan dan kenyamanan setiap ruangan dengan desain yang berkelas.
+          Belajar tak lagi menunggu, kami menyatukan semangat belajar dengan tutor yang siap menemani secara langsung.
         </motion.p>
 
         {/* Tombol CTA */}

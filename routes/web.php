@@ -17,6 +17,7 @@ use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\VideoCallController;
 use App\Http\Controllers\Forum\PostController;
 use App\Http\Controllers\Forum\ThreadController;
+use App\Http\Controllers\PelajarController;
 
 /*
 |--------------------------------------------------------------------------
@@ -64,6 +65,8 @@ Route::middleware(['check.session'])->group(function () {
     Route::get('/tutor', function () {
         return view('mainpage/tutor/index');
     })->name('tutor');
+    Route::get('/pelajar', [PelajarController::class, 'dashboard'])->name('pelajar');
+
     
     // ------------------------------------------- Profile Routes -------------------------------------------
     Route::get('/profile/pelajar', [ProfileController::class, 'editPelajar'])->name('profile.edit.pelajar');
@@ -72,6 +75,7 @@ Route::middleware(['check.session'])->group(function () {
     Route::put('/profile/tutor', [ProfileController::class, 'updateTutor'])->name('profile.update.tutor');
     
     // ------------------------------------------- Tutor Management -------------------------------------------
+    Route::get('/tutor', [TutorController::class, 'dashboard'])->name('tutor');
     Route::get('/findTutor', [FindTutorController::class, 'index'])->name('findTutor');
     Route::get('/get-tutors', [FindTutorController::class, 'getTutors'])->name('tutors.get');
     Route::post('/tutor/toggle-availability', [TutorController::class, 'toggleAvailability']);

@@ -6,12 +6,12 @@ const Footer = () => {
     <section id="footer">
 
       <footer className="bg-gray-900 text-white py-10">
-        <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-5 gap-8">
+        <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Kolom 1 */}
           <div>
             <h4 className="font-semibold mb-3">TENTANG KAMI</h4>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="hover-underline">Profil Perusahaan</a></li>
+              <li><a href="#about" className="hover-underline">Profil Perusahaan</a></li>
               <li><a href="#" className="hover-underline">Kebijakan Privasi</a></li>
               <li><a href="#" className="hover-underline">Kontak</a></li>
             </ul>
@@ -21,21 +21,19 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold mb-3">LAYANAN KAMI</h4>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="hover-underline">Pemasangan & Pembongkaran</a></li>
-              <li><a href="#" className="hover-underline">Penyewaan & Penjualan</a></li>
-              <li><a href="#" className="hover-underline">Inspeksi</a></li>
-              <li><a href="#" className="hover-underline">Konsultasi</a></li>
+              <li><a href="#tutor" className="hover-underline">Find Tutor</a></li>
+              <li><a href="#forum" className="hover-underline">Public Thread</a></li>
             </ul>
           </div>
 
           {/* Kolom 3 */}
-          <div>
+          {/* <div>
             <h4 className="font-semibold mb-3">BLOG</h4>
             <ul className="space-y-2 text-sm">
               <li><a href="#" className="hover-underline">Berita</a></li>
               <li><a href="#" className="hover-underline">Artikel</a></li>
             </ul>
-          </div>
+          </div> */}
 
          {/* Kolom 4 */}
           <div>

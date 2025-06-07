@@ -10,20 +10,27 @@ class TransaksiController extends Controller
 {
     public function transaksiList(Request $request)
     {
-        $query = Transaction::query();
+        $query = Transaction::with(['student', 'tutor']);
 
-        // Cek apakah ada pencarian berdasarkan student_id atau tutor_id
         if ($request->has('search')) {
             $search = $request->input('search');
-            $query->where('id', 'LIKE', "%{$search}%")
-                ->orwhere('student_id', 'LIKE', "%{$search}%")
-                ->orWhere('tutor_id', 'LIKE', "%{$search}%");
+
+            $query->where(function ($q) use ($search) {
+                $q->where('id', 'LIKE', "%{$search}%")
+                ->orWhereHas('student', function ($qs) use ($search) {
+                    $qs->where('email', 'LIKE', "%{$search}%");
+                })
+                ->orWhereHas('tutor', function ($qt) use ($search) {
+                    $qt->where('email', 'LIKE', "%{$search}%");
+                });
+            });
         }
 
         $transactions = $query->orderBy('created_at', 'desc')->paginate(10);
 
         return view('admin.transaksi', compact('transactions'));
     }
+
 
     public function destroyTransaction($id)
     {
@@ -74,17 +81,20 @@ class TransaksiController extends Controller
             ->leftJoin('roomzoomcall', 'transactions.id', '=', 'roomzoomcall.transaction_id')
             ->leftJoin('msuser as student', 'transactions.student_id', '=', 'student.id')
             ->leftJoin('msuser as tutor', 'transactions.tutor_id', '=', 'tutor.id')
+            ->leftJoin('mssubject', 'transactions.subject_id', '=', 'mssubject.id')
             ->select(
                 'transactions.*', 
                 'roomzoomcall.meeting_url',
                 'student.username as student_name',
-                'tutor.username as tutor_name'
+                'tutor.username as tutor_name',
+                'mssubject.subjectName as subject_name'
             )
             ->orderBy('transactions.created_at', 'desc')
             ->paginate(10);
-
-        // Query Transaksi Belum Diberi Rating dengan Pagination
-        $unratedTransactions = DB::table('transactions')
+            
+            // Query Transaksi Belum Diberi Rating dengan Pagination
+            $unratedTransactions = DB::table('transactions')
+            ->leftJoin('mssubject', 'transactions.subject_id', '=', 'mssubject.id')
             ->where('transactions.status', 'confirmed')
             ->whereNull('transactions.rating')
             ->where(function ($q) use ($userId, $role) {
@@ -95,7 +105,12 @@ class TransaksiController extends Controller
                 }
             })
             ->leftJoin('msuser as tutor', 'transactions.tutor_id', '=', 'tutor.id')
-            ->select('transactions.id', 'transactions.created_at', 'tutor.username as tutor_name')
+            ->select(
+                'transactions.id',
+                'transactions.created_at',
+                'tutor.username as tutor_name',
+                'mssubject.subjectName as subject_name'
+            )
             ->orderBy('transactions.created_at', 'desc')
             ->paginate(5, ['*'], 'unrated_page'); // Gunakan page query parameter yang berbeda
 

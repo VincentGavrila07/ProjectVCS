@@ -1,7 +1,8 @@
 import React from "react";
 import { motion } from "framer-motion";
 import studyingSession from "../../../public/images/AboutUsImage.jpg"; // Pastikan path gambar benar
-
+import { useState } from "react";
+import { useEffect } from "react";
 const teamMembers = [
     { id: 1, name: "Vincent Gavrila", role: "CEO AND FOUNDER", image: "/images/vincent.jpeg" },
     { id: 2, name: "Belmiro Kayru", role: "CEO AND FOUNDER", image: "/images/papgantenghot.jpeg" },
@@ -9,8 +10,28 @@ const teamMembers = [
     { id: 4, name: "Rafael Dillon", role: "CEO AND FOUNDER", image: "/images/dillon.jpg" },
     { id: 5, name: "Bernardus William", role: "CEO AND FOUNDER", image: "/images/william.jpg" },
 ];
-
 const AboutUs = () => {
+  const [isOpen, setIsOpen] = useState(false);
+    useEffect(() => {
+    if (isOpen) {
+      // Disable scroll
+      document.body.style.overflow = "hidden";
+    } else {
+      // Enable scroll kembali
+      document.body.style.overflow = "";
+    }
+
+    // Cleanup saat component unmount / isOpen berubah
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+  
+    const lorem = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod...`; // akan diganti di bawah
+  
+    const paragraph = `Perkembangan teknologi digital telah mengubah cara kita belajar secara signifikan. Di tengah kemajuan tersebut, Video Call Study hadir sebagai solusi pembelajaran daring yang menawarkan metode belajar interaktif dan fleksibel melalui video call secara real-time. Kami percaya bahwa proses belajar yang efektif membutuhkan interaksi langsung antara siswa dan tutor agar materi dapat dipahami lebih baik, serta penyesuaian waktu belajar yang sesuai dengan jadwal individu. Oleh karena itu, VCS dirancang untuk memberikan pengalaman belajar yang personal dan menyenangkan, tanpa batasan ruang dan waktu.`
+
+    const paragraph2 = `Kami berkomitmen untuk menghadirkan platform pembelajaran yang tidak hanya menyediakan materi secara pasif, tetapi juga memfasilitasi komunikasi dua arah antara siswa dan pengajar. Dengan fitur penjadwalan yang fleksibel dan integrasi teknologi video call, VCS memudahkan siswa dalam mendapatkan bimbingan yang fokus dan sesuai kebutuhan mereka. Melalui inovasi ini, kami berharap dapat mendukung transformasi pendidikan digital yang lebih manusiawi dan inklusif, sekaligus membuka kesempatan bagi siapa saja untuk belajar dengan cara yang lebih efektif dan menyenangkan.`
   return (
     <section id="about" className="relative w-full min-h-screen bg-gray-50">
       {/* Background Section */}
@@ -29,12 +50,28 @@ const AboutUs = () => {
             <p className="mt-6 text-base md:text-lg text-gray-300 leading-relaxed">
               Video Call Study is a platform that connects students and tutors for an enhanced virtual learning experience. Our mission is to create an interactive, engaging, and productive study environment.
             </p>
-            <a 
-              href="#" 
+            <button
+              onClick={() => setIsOpen(true)}
               className="inline-block mt-6 px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-all"
             >
               Learn More
-            </a>
+            </button>
+
+            {isOpen && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                <div className="bg-white max-w-lg w-full max-h-[80vh] rounded-lg shadow-lg overflow-y-auto p-6 relative">
+                  <button
+                    onClick={() => setIsOpen(false)}
+                    className="absolute top-2 right-2 text-gray-600 hover:text-black text-xl font-bold"
+                  >
+                    &times;
+                  </button>
+                  <h2 className="text-2xl font-bold mb-4 text-gray-800">More Information</h2>
+                    <p className="mb-4 text-gray-800">{paragraph}</p>
+                    <p className="text-gray-800">{paragraph2}</p>
+                </div>
+              </div>
+            )}
           </motion.div>
         </div>
 

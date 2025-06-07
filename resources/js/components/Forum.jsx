@@ -3,7 +3,7 @@ import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/id'; // kalau kamu mau pakai Bahasa Indonesia juga
-
+import { motion } from "framer-motion";
 dayjs.extend(relativeTime);
 dayjs.locale('en'); // atau 'id'
 
@@ -57,9 +57,17 @@ const Forum = () => {
   };
 
   return (
-    <section id="forum" className="py-10 px-4 max-w-5xl mx-auto">
-      <h2 className="text-xl font-bold text-gray-800 mb-6">Thread Publik</h2>
-      <div className="space-y-6">
+    <section id="forum" className="py-10 px-4 max-w-5xl mx-auto ">
+        <motion.h3
+          className="text-3xl md:text-4xl font-extrabold text-blue-600 text-center"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.5 }}
+          viewport={{ once: false }}
+        >
+          Public Thread
+        </motion.h3>
+      <div className="space-y-6 mt-12">
         {threads.length > 0 ? threads.map((thread) => (
           <div key={thread.id} className="bg-white p-6 rounded-2xl shadow border-l-4 border-blue-100 hover:shadow-md transition duration-300">
             <span className={`inline-block ${thread.thread_subject ? 'bg-blue-50 text-blue-600' : 'bg-gray-100 text-gray-600'} text-sm font-medium rounded-full px-3 py-1 mb-3`}>

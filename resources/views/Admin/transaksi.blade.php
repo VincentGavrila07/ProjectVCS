@@ -6,7 +6,7 @@
     <!-- Panel Pencarian -->
     <form method="GET" action="{{ route('transaksiList') }}" class="mb-4">
         <div class="flex items-center">
-            <input type="text" name="search" value="{{ request()->input('search') }}" placeholder="Cari berdasarkan  id, StudentID, Tutor ID" class="border px-4 py-2 rounded-lg mr-2 w-96">
+            <input type="text" name="search" value="{{ request()->input('search') }}" placeholder="Cari berdasarkan  id, student email, tutor email" class="border px-4 py-2 rounded-lg mr-2 w-96">
             <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">
                 <i class="fas fa-search"></i> <!-- Ikon search -->
             </button>
@@ -18,8 +18,8 @@
         <thead>
             <tr class="bg-gray-800 text-white">
                 <th class="border border-gray-300 px-4 py-2">ID</th>
-                <th class="border border-gray-300 px-4 py-2">Student ID</th>
-                <th class="border border-gray-300 px-4 py-2">Tutor ID</th>
+                <th class="border border-gray-300 px-4 py-2">Student Email</th>
+                <th class="border border-gray-300 px-4 py-2">Tutor Email</th>
                 <th class="border border-gray-300 px-4 py-2">Amount</th>
                 <th class="border border-gray-300 px-4 py-2">Status</th>
                 <th class="border border-gray-300 px-4 py-2">Status VCS</th>
@@ -31,8 +31,12 @@
             @foreach ($transactions as $transaction)
                 <tr class="bg-gray-100">
                     <td class="border border-gray-300 px-4 py-2">{{ $transaction->id }}</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ $transaction->student_id }}</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ $transaction->tutor_id }}</td>
+                    <td class="border border-gray-300 px-4 py-2">
+                        {{ $transaction->student->email ?? 'Tidak Diketahui' }}
+                    </td>
+                    <td class="border border-gray-300 px-4 py-2">
+                        {{ $transaction->tutor->email ?? 'Tidak Diketahui' }}
+                    </td>
                     <td class="border border-gray-300 px-4 py-2">{{ number_format($transaction->amount, 2) }}</td>
                     <td class="border border-gray-300 px-4 py-2">{{ ucfirst($transaction->status) }}</td>
                     <td class="border border-gray-300 px-4 py-2">
