@@ -65,7 +65,7 @@ const Forum = () => {
           transition={{ duration: 1.5 }}
           viewport={{ once: false }}
         >
-          Public Thread
+        Thread
         </motion.h3>
       <div className="space-y-6 mt-12">
         {threads.length > 0 ? threads.map((thread) => (

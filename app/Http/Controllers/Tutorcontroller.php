@@ -131,7 +131,23 @@ public function dashboard()
         $tutor = MsUser::find($tutorId);
         // dd($subjectId);
         // dd($tutor);
+        $studentWallet = Wallet::where('user_id', $studentId)->first();
 
+            // Kalau belum punya wallet, bisa bikin otomatis
+            if (!$studentWallet) {
+                $studentWallet = Wallet::create([
+                    'user_id' => $studentId,
+                    'balance' => 0,
+                ]);
+            }
+
+            // Validasi saldo cukup
+            if ($studentWallet->balance < $amount) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Saldo Anda tidak mencukupi untuk menyewa tutor ini.',
+                ]);
+            }
         DB::beginTransaction();
         try {
             // Buat transaksi
@@ -213,9 +229,13 @@ public function confirmRequest(Request $request)
         $tutorWallet = Wallet::where('user_id', $transaction->tutor_id)->first();
 
         if (!$studentWallet) {
-            Log::error('Wallet pelajar tidak ditemukan:', ['student_id' => $transaction->student_id]);
-            return response()->json(['success' => false, 'message' => 'Wallet pelajar tidak ditemukan.']);
+            Log::info('Wallet pelajar tidak ditemukan. Membuat wallet baru...', ['student_id' => $transaction->student_id]);
+            $studentWallet = Wallet::create([
+                'user_id' => $transaction->student_id,
+                'balance' => 0,
+            ]);
         }
+
         if (!$tutorWallet) {
             Log::error('Wallet pelajar tidak ditemukan:', ['tutor_id' => $transaction->student_id]);
             return response()->json(['success' => false, 'message' => 'Wallet tutor tidak ditemukan.']);

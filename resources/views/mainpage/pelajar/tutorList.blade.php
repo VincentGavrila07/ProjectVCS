@@ -83,6 +83,6 @@
         // Tutup Swal setelah konten benar-benar dirender (opsional: timer fallback)
         setTimeout(() => {
             Swal.close();
-        }, 3500); // atau kamu bisa ganti ini jadi observer kalau lebih dinamis
+        }, 4000); // atau kamu bisa ganti ini jadi observer kalau lebih dinamis
     });
 </script>

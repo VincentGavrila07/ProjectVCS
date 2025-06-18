@@ -87,7 +87,7 @@ const TutorSlider = () => {
                                         </span>
                                     </div>
                                     <div className="mt-2 text-blue-600 font-bold text-lg">
-                                        Rp {tutor.price.toLocaleString("id-ID")} <span className="text-gray-500 line-through"> Rp {(tutor.price * 1.2).toLocaleString("id-ID")} </span>
+                                        Rp {tutor.price.toLocaleString("id-ID")} <span className="text-gray-500 line-through"> Rp {(tutor.price * 1.2).toLocaleString("id-ID")} </span> / jam
                                     </div>
                                     <a href="/login" className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg text-sm hover:bg-blue-700 transition-all">
                                         Chat

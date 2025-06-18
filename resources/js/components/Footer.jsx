@@ -1,5 +1,5 @@
 import React from "react";
-import { FaFacebookF, FaTwitter, FaLinkedinIn , FaMapMarkerAlt, FaPhoneAlt, FaEnvelope} from "react-icons/fa";
+import { FaFacebookF, FaTwitter, FaLinkedinIn , FaMapMarkerAlt, FaPhoneAlt, FaEnvelope,FaInstagram} from "react-icons/fa";
 
 const Footer = () => {
   return (
@@ -78,9 +78,16 @@ const Footer = () => {
 
             {/* Ikon Sosial Media */}
             <div className="flex space-x-4 mt-4 md:mt-0">
-              <FaFacebookF className="cursor-pointer hover:text-gray-300" />
-              <FaTwitter className="cursor-pointer hover:text-gray-300" />
-              <FaLinkedinIn className="cursor-pointer hover:text-gray-300" />
+              <a href="https://www.instagram.com/vcsbinus">
+                <FaInstagram className="cursor-pointer hover:text-gray-300" />
+              </a>
+              <a href="">
+                <FaFacebookF className="cursor-pointer hover:text-gray-300" />  
+              </a>
+              <a href="">
+                <FaTwitter className="cursor-pointer hover:text-gray-300" />
+              </a>
+              {/* <FaLinkedinIn className="cursor-pointer hover:text-gray-300" /> */}
             </div>
           </div>
         </div>

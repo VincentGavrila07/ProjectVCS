@@ -44,8 +44,8 @@ const Navbar = () => {
         <ul className="hidden md:flex space-x-8 text-white text-lg font-medium">
           {[
             { name: "Home", to: "home" },
-            { name: "About Us", to: "about" },
             { name: "Tutors", to: "tutor" },
+            { name: "About Us", to: "about" },
             { name: "Forum", to: "forum" },
             { name: "Contact Us", to: "footer" }
           ].map((item, index) => (

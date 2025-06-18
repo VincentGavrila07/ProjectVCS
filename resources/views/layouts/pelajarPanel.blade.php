@@ -176,7 +176,7 @@
 
                 if (!chattingLi) return;
 
-                const redDot = chattingLi.querySelector('span');
+                // const redDot = chattingLi.querySelector('span');
 
                 if (unreadCount > 0) {
                     if (redDot) {
